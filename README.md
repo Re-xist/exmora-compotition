@@ -5,6 +5,8 @@
 [![Java](https://img.shields.io/badge/Java-11+-blue.svg)](https://www.oracle.com/java/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange.svg)](https://www.mysql.com/)
 [![Tomcat](https://img.shields.io/badge/Tomcat-10+-yellow.svg)](https://tomcat.apache.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Author](https://img.shields.io/badge/Author-Re--xist-purple.svg)](https://github.com/Re-xist)
 
 ## Overview
 
@@ -44,7 +46,7 @@ Examora is a comprehensive online examination system designed for schools, corpo
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/examora.git
+   git clone https://github.com/Re-xist/examora.git
    cd examora
    ```
 
@@ -162,6 +164,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For support, email support@examora.com or join our Discord channel.
 
+## Author
+
+**Re-xist** - [GitHub](https://github.com/Re-xist)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ---
 
 **Examora** - Empowering Education Through Technology
+
+Made with ❤️ by [Re-xist](https://github.com/Re-xist)
