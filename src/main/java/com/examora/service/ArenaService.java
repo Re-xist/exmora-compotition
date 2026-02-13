@@ -28,7 +28,7 @@ public class ArenaService {
     private QuestionDAO questionDAO;
 
     // Scoring constants
-    private static final int BASE_POINT = 100;
+    private static final int BASE_POINT = 1000;
 
     public ArenaService() {
         this.sessionDAO = new ArenaSessionDAO();
@@ -405,7 +405,7 @@ public class ArenaService {
         // Validate time parameters
         if (totalTimeSeconds == null || totalTimeSeconds <= 0) {
             // If time is invalid, give base minimum score for correct answer
-            return 10;
+            return 100;
         }
 
         // Convert time to same unit (milliseconds)
@@ -424,8 +424,8 @@ public class ArenaService {
         // Calculate final score
         int score = (int) (BASE_POINT * speedMultiplier);
 
-        // Minimum score for correct answer (10 points), maximum is BASE_POINT
-        return Math.max(10, Math.min(score, BASE_POINT));
+        // Minimum score for correct answer (100 points), maximum is BASE_POINT (1000)
+        return Math.max(100, Math.min(score, BASE_POINT));
     }
 
     /**

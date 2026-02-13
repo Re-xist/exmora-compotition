@@ -88,6 +88,7 @@
         <ul class="sidebar-menu">
             <li><a href="../AdminServlet?action=dashboard"><i class="bi bi-speedometer2"></i>Dashboard</a></li>
             <li><a href="../QuizServlet?action=list"><i class="bi bi-journal-text"></i>Kelola Quiz</a></li>
+            <li><a href="../ArenaServlet?action=list"><i class="bi bi-trophy"></i>Kelola Arena</a></li>
             <li><a href="../AdminServlet?action=users"><i class="bi bi-people"></i>Kelola User</a></li>
             <li><a href="../AdminServlet?action=statistics" class="active"><i class="bi bi-graph-up"></i>Statistik</a></li>
             <li><a href="../SettingsServlet"><i class="bi bi-gear"></i>Pengaturan</a></li>

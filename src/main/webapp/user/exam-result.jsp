@@ -62,6 +62,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="../ArenaServlet?action=join">
+                            <i class="bi bi-trophy me-1"></i>Arena
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="../ExamServlet?action=history">
                             <i class="bi bi-clock-history me-1"></i>Riwayat
                         </a>
