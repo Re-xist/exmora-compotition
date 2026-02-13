@@ -16,7 +16,7 @@ public class UserDAO {
      * Create a new user
      */
     public User create(User user) throws SQLException {
-        String sql = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (name, email, password, role, tag) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -25,6 +25,7 @@ public class UserDAO {
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
             stmt.setString(4, user.getRole());
+            stmt.setString(5, user.getTag());
 
             int affectedRows = stmt.executeUpdate();
 
@@ -149,7 +150,7 @@ public class UserDAO {
      * Update user
      */
     public boolean update(User user) throws SQLException {
-        String sql = "UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?";
+        String sql = "UPDATE users SET name = ?, email = ?, role = ?, tag = ?, photo = ? WHERE id = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -157,7 +158,9 @@ public class UserDAO {
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getRole());
-            stmt.setInt(4, user.getId());
+            stmt.setString(4, user.getTag());
+            stmt.setString(5, user.getPhoto());
+            stmt.setInt(6, user.getId());
 
             return stmt.executeUpdate() > 0;
         }
@@ -234,6 +237,45 @@ public class UserDAO {
     }
 
     /**
+     * Get all unique tags
+     */
+    public List<String> findAllTags() throws SQLException {
+        String sql = "SELECT DISTINCT tag FROM users WHERE tag IS NOT NULL AND tag != '' ORDER BY tag";
+        List<String> tags = new ArrayList<>();
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                tags.add(rs.getString("tag"));
+            }
+        }
+        return tags;
+    }
+
+    /**
+     * Get users by tag
+     */
+    public List<User> findByTag(String tag) throws SQLException {
+        String sql = "SELECT * FROM users WHERE tag = ? ORDER BY created_at DESC";
+        List<User> users = new ArrayList<>();
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, tag);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    users.add(mapResultSetToUser(rs));
+                }
+            }
+        }
+        return users;
+    }
+
+    /**
      * Map ResultSet to User object
      */
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
@@ -243,8 +285,26 @@ public class UserDAO {
         user.setEmail(rs.getString("email"));
         user.setPassword(rs.getString("password"));
         user.setRole(rs.getString("role"));
+        user.setTag(rs.getString("tag"));
+        user.setPhoto(rs.getString("photo"));
         user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         user.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
         return user;
+    }
+
+    /**
+     * Update photo only
+     */
+    public boolean updatePhoto(Integer userId, String photoPath) throws SQLException {
+        String sql = "UPDATE users SET photo = ? WHERE id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, photoPath);
+            stmt.setInt(2, userId);
+
+            return stmt.executeUpdate() > 0;
+        }
     }
 }

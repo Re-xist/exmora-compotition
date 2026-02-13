@@ -11,10 +11,13 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'peserta') NOT NULL DEFAULT 'peserta',
+    tag VARCHAR(50) DEFAULT NULL COMMENT 'Tag/kelompok untuk user (contoh: Kelas A, Divisi IT, dll)',
+    photo VARCHAR(255) DEFAULT NULL COMMENT 'Profile photo path',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email),
-    INDEX idx_role (role)
+    INDEX idx_role (role),
+    INDEX idx_tag (tag)
 ) ENGINE=InnoDB;
 
 -- Quiz Table
@@ -103,9 +106,9 @@ CREATE TABLE quiz_sessions (
 
 -- Insert default admin user (password: admin123)
 -- Password is hashed with bcrypt
-INSERT INTO users (name, email, password, role) VALUES
-('Administrator', 'admin@examora.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin');
+INSERT INTO users (name, email, password, role, tag) VALUES
+('Administrator', 'admin@examora.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin', NULL);
 
 -- Insert sample peserta user (password: user123)
-INSERT INTO users (name, email, password, role) VALUES
-('Peserta Demo', 'user@examora.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'peserta');
+INSERT INTO users (name, email, password, role, tag) VALUES
+('Peserta Demo', 'user@examora.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'peserta', 'Kelas A');

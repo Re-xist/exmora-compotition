@@ -8,7 +8,9 @@
         return;
     }
     List<User> users = (List<User>) request.getAttribute("users");
+    List<String> tags = (List<String>) request.getAttribute("tags");
     String roleFilter = (String) request.getAttribute("roleFilter");
+    String tagFilter = (String) request.getAttribute("tagFilter");
     String success = (String) request.getAttribute("success");
     String error = (String) request.getAttribute("error");
 %>
@@ -35,6 +37,7 @@
             <li><a href="../QuizServlet?action=list"><i class="bi bi-journal-text"></i>Kelola Quiz</a></li>
             <li><a href="../AdminServlet?action=users" class="active"><i class="bi bi-people"></i>Kelola User</a></li>
             <li><a href="../AdminServlet?action=statistics"><i class="bi bi-graph-up"></i>Statistik</a></li>
+            <li><a href="../SettingsServlet"><i class="bi bi-gear"></i>Pengaturan</a></li>
             <li class="mt-5"><a href="../LogoutServlet"><i class="bi bi-box-arrow-left"></i>Logout</a></li>
         </ul>
     </nav>
@@ -82,9 +85,19 @@
                     </div>
                     <div class="col-auto">
                         <select name="role" class="form-select" onchange="this.form.submit()">
-                            <option value="">Semua User</option>
+                            <option value="">Semua Role</option>
                             <option value="admin" <%= "admin".equals(roleFilter) ? "selected" : "" %>>Admin</option>
                             <option value="peserta" <%= "peserta".equals(roleFilter) ? "selected" : "" %>>Peserta</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <select name="tag" class="form-select" onchange="this.form.submit()">
+                            <option value="">Semua Tag</option>
+                            <% if (tags != null) {
+                                for (String tag : tags) { %>
+                            <option value="<%= tag %>" <%= tag.equals(tagFilter) ? "selected" : "" %>><%= tag %></option>
+                            <% }
+                            } %>
                         </select>
                     </div>
                     <div class="col-auto">
@@ -158,6 +171,7 @@
                                 <th>Nama</th>
                                 <th>Email</th>
                                 <th>Role</th>
+                                <th>Tag</th>
                                 <th>Terdaftar</th>
                                 <th>Aksi</th>
                             </tr>
@@ -183,18 +197,27 @@
                                     <span class="badge bg-success"><i class="bi bi-person me-1"></i>Peserta</span>
                                     <% } %>
                                 </td>
+                                <td>
+                                    <% if (user.getTag() != null && !user.getTag().isEmpty()) { %>
+                                    <span class="badge bg-info"><i class="bi bi-tag me-1"></i><%= user.getTag() %></span>
+                                    <% } else { %>
+                                    <span class="text-muted">-</span>
+                                    <% } %>
+                                </td>
                                 <td><%= user.getCreatedAt() != null ? user.getCreatedAt().toLocalDate() : "-" %></td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
                                         <button type="button" class="btn btn-outline-info" title="Detail"
                                                 onclick="showUserDetail(<%= user.getId() %>, '<%= user.getName() %>',
                                                 '<%= user.getEmail() %>', '<%= user.getRole() %>',
+                                                '<%= user.getTag() != null ? user.getTag().replace("'", "\\'") : "" %>',
                                                 '<%= user.getCreatedAt() != null ? user.getCreatedAt().toLocalDate() : "-" %>')">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-warning" title="Edit"
                                                 onclick="showEditModal(<%= user.getId() %>, '<%= user.getName() %>',
-                                                '<%= user.getEmail() %>', '<%= user.getRole() %>')">
+                                                '<%= user.getEmail() %>', '<%= user.getRole() %>',
+                                                '<%= user.getTag() != null ? user.getTag().replace("'", "\\'") : "" %>')">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-secondary" title="Reset Password"
@@ -248,6 +271,10 @@
                         <tr>
                             <td class="text-muted">Role:</td>
                             <td id="modalRole">Peserta</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Tag:</td>
+                            <td id="modalTag">-</td>
                         </tr>
                         <tr>
                             <td class="text-muted">Terdaftar:</td>
@@ -322,6 +349,19 @@
                                 <option value="admin">Admin</option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tag</label>
+                            <input type="text" class="form-control" name="tag" id="createTag"
+                                   list="tagList" placeholder="Contoh: Kelas A, Divisi IT, dll">
+                            <datalist id="tagList">
+                                <% if (tags != null) {
+                                    for (String tag : tags) { %>
+                                <option value="<%= tag %>">
+                                <% }
+                                } %>
+                            </datalist>
+                            <small class="text-muted">Tag untuk mengelompokkan user (opsional)</small>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -360,6 +400,19 @@
                                 <option value="peserta">Peserta</option>
                                 <option value="admin">Admin</option>
                             </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tag</label>
+                            <input type="text" class="form-control" name="tag" id="editTag"
+                                   list="tagListEdit" placeholder="Contoh: Kelas A, Divisi IT, dll">
+                            <datalist id="tagListEdit">
+                                <% if (tags != null) {
+                                    for (String tag : tags) { %>
+                                <option value="<%= tag %>">
+                                <% }
+                                } %>
+                            </datalist>
+                            <small class="text-muted">Tag untuk mengelompokkan user (opsional)</small>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -428,13 +481,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function showUserDetail(id, name, email, role, date) {
+        function showUserDetail(id, name, email, role, tag, date) {
             document.getElementById('modalAvatar').textContent = name.charAt(0).toUpperCase();
             document.getElementById('modalName').textContent = name;
             document.getElementById('modalEmail').textContent = email;
             document.getElementById('modalRole').innerHTML = role === 'admin'
                 ? '<span class="badge bg-primary"><i class="bi bi-shield-check me-1"></i>Admin</span>'
                 : '<span class="badge bg-success"><i class="bi bi-person me-1"></i>Peserta</span>';
+            document.getElementById('modalTag').innerHTML = tag && tag.trim() !== ''
+                ? '<span class="badge bg-info"><i class="bi bi-tag me-1"></i>' + tag + '</span>'
+                : '<span class="text-muted">-</span>';
             document.getElementById('modalDate').textContent = date;
 
             new bootstrap.Modal(document.getElementById('userDetailModal')).show();
@@ -446,11 +502,12 @@
             new bootstrap.Modal(document.getElementById('deleteModal')).show();
         }
 
-        function showEditModal(userId, name, email, role) {
+        function showEditModal(userId, name, email, role, tag) {
             document.getElementById('editUserId').value = userId;
             document.getElementById('editName').value = name;
             document.getElementById('editEmail').value = email;
             document.getElementById('editRole').value = role;
+            document.getElementById('editTag').value = tag || '';
             new bootstrap.Modal(document.getElementById('editUserModal')).show();
         }
 

@@ -59,6 +59,11 @@
                     <i class="bi bi-graph-up"></i>Statistik
                 </a>
             </li>
+            <li>
+                <a href="../SettingsServlet">
+                    <i class="bi bi-gear"></i>Pengaturan
+                </a>
+            </li>
             <li class="mt-5">
                 <a href="../LogoutServlet">
                     <i class="bi bi-box-arrow-left"></i>Logout

@@ -11,6 +11,8 @@ public class User {
     private String email;
     private String password;
     private String role;
+    private String tag; // Tag/kelompok user (contoh: Kelas A, Divisi IT, dll)
+    private String photo; // Profile photo path
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -22,6 +24,14 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public User(String name, String email, String password, String role, String tag) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.tag = tag;
     }
 
     // Getters and Setters
@@ -63,6 +73,22 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
     }
 
     public LocalDateTime getCreatedAt() {

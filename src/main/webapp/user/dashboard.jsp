@@ -60,8 +60,9 @@
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
-                    <span class="text-white me-3">
+                    <a href="../SettingsServlet" class="text-white text-decoration-none me-3">
                         <i class="bi bi-person-circle me-1"></i><%= currentUser.getName() %>
+                    </a>
                     </span>
                     <a href="../LogoutServlet" class="btn btn-outline-light btn-sm">
                         <i class="bi bi-box-arrow-left me-1"></i>Logout
