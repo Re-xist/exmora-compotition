@@ -43,7 +43,7 @@
                 </a>
             </li>
             <li>
-                <a href="arena-list.jsp" class="active">
+                <a href="../ArenaServlet?action=list" class="active">
                     <i class="bi bi-trophy"></i>Kelola Arena
                 </a>
             </li>
