@@ -12,6 +12,7 @@
     Question question = (Question) request.getAttribute("question");
     boolean isEdit = question != null && question.getId() != null;
     String error = (String) request.getAttribute("error");
+    String successParam = request.getParameter("success");
 
     if (quiz == null) {
         response.sendRedirect("../QuizServlet?action=list");
@@ -65,6 +66,13 @@
         <% if (error != null) { %>
         <div class="alert alert-danger alert-dismissible fade show">
             <i class="bi bi-exclamation-triangle me-2"></i><%= error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <% } %>
+
+        <% if ("true".equals(successParam)) { %>
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-2"></i>Pertanyaan berhasil ditambahkan. Silakan tambah pertanyaan berikutnya.
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         <% } %>
@@ -129,11 +137,12 @@
                             </div>
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary">
+                                <input type="hidden" name="saveAndAdd" id="saveAndAdd" value="">
+                                <button type="submit" class="btn btn-primary" onclick="document.getElementById('saveAndAdd').value='';">
                                     <i class="bi bi-check-lg me-2"></i><%= isEdit ? "Update" : "Simpan" %>
                                 </button>
                                 <% if (!isEdit) { %>
-                                <button type="submit" name="saveAndAdd" value="true" class="btn btn-success">
+                                <button type="submit" class="btn btn-success" onclick="document.getElementById('saveAndAdd').value='true';">
                                     <i class="bi bi-plus-lg me-2"></i>Simpan & Tambah Lagi
                                 </button>
                                 <% } %>
