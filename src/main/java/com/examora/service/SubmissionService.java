@@ -43,6 +43,11 @@ public class SubmissionService {
                 throw new ServiceException("Quiz belum dipublish");
             }
 
+            // Check if quiz has expired (past deadline)
+            if (quiz.isExpired()) {
+                throw new ServiceException("Quiz sudah melewati deadline (" + quiz.getFormattedDeadline() + ")");
+            }
+
             // Check if user has already submitted
             if (submissionDAO.hasSubmitted(userId, quizId)) {
                 throw new ServiceException("Anda sudah mengerjakan quiz ini");

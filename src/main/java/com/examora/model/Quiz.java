@@ -121,12 +121,15 @@ public class Quiz {
         this.questionCount = questionCount;
     }
 
-    // Check if quiz is expired (past deadline)
+    // Check if quiz is expired (past deadline) using WIB timezone
     public boolean isExpired() {
         if (deadline == null) {
             return false;
         }
-        return LocalDateTime.now().isAfter(deadline);
+        // Compare using WIB (Asia/Jakarta) timezone for consistency
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Jakarta"));
+        ZonedDateTime deadlineWib = deadline.atZone(ZoneId.of("Asia/Jakarta"));
+        return now.isAfter(deadlineWib);
     }
 
     // Check if quiz is available (active and not expired)

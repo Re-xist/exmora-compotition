@@ -79,7 +79,7 @@
                             <div class="mb-3 form-check">
                                 <input type="checkbox" class="form-check-input" id="terms" required>
                                 <label class="form-check-label" for="terms">
-                                    Saya menyetujui <a href="#">Syarat & Ketentuan</a>
+                                    Saya menyetujui <a href="terms.jsp" target="_blank">Syarat & Ketentuan</a>
                                 </label>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 py-2">

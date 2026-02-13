@@ -78,17 +78,6 @@
                             </a>
                         </div>
 
-                        <div class="mt-4">
-                            <div class="card bg-light">
-                                <div class="card-body py-2 px-3">
-                                    <small class="text-muted">
-                                        <strong>Demo Account:</strong><br>
-                                        Admin: admin@examora.com / admin123<br>
-                                        User: user@examora.com / user123
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="text-center mt-3">

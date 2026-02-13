@@ -1,6 +1,6 @@
-# Examora - Smart Assessment Platform
+# EXAMORA - Secure Assessment Platform
 
-> **Modern, Secure, and Scalable Online Examination System**
+> **Official Secure Assessment Platform by IDS Cyber Security Academy**
 
 [![Java](https://img.shields.io/badge/Java-11+-blue.svg)](https://www.oracle.com/java/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange.svg)](https://www.mysql.com/)
@@ -8,20 +8,68 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Author](https://img.shields.io/badge/Author-Re--xist-purple.svg)](https://github.com/Re-xist)
 
-## Overview
+---
 
-Examora is a comprehensive online examination system designed for schools, corporate training, and certification programs. Built with modern architecture principles, it provides a secure and scalable platform for conducting quizzes and exams.
+## Apa Itu Examora?
 
-## Features
+Examora adalah platform ujian dan sistem evaluasi resmi yang digunakan dalam program **IDS Cyber Security Academy** untuk mengukur, memvalidasi, dan mendokumentasikan kompetensi peserta secara terstruktur.
 
-- **User Management**: Multi-role system (Admin/Participant)
-- **Quiz Management**: Create, edit, publish quizzes with ease
-- **Question Bank**: Multiple choice questions with 4 options
-- **Auto-Scoring**: Automatic score calculation
-- **Timer System**: Countdown timer with auto-submit
-- **Result Analysis**: Detailed score reports and statistics
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Security**: Password hashing, CSRF protection, input sanitization
+Examora dirancang sebagai **Secure Online Assessment System** yang memastikan setiap peserta benar-benar memahami konsep keamanan siber sebelum melanjutkan ke tahap praktik dan eksploitasi di lab.
+
+Platform ini bukan sekadar sistem quiz biasa, melainkan bagian dari arsitektur akademik yang terintegrasi dengan:
+- Kurikulum pembelajaran
+- Lab praktik dan CTF
+- Sistem pelaporan akademik
+- Standarisasi kelulusan
+
+---
+
+## Fungsi Utama Examora
+
+### Validasi Kompetensi
+
+Examora digunakan untuk memastikan bahwa peserta memahami:
+- Konsep dasar cybersecurity
+- Logic serangan (SQLi, XSS, SSRF, dll)
+- Authentication & session security
+- OWASP Top 10
+- Metodologi penetration testing
+
+### Platform Ujian Resmi
+
+- Quiz mingguan
+- Ujian tengah program
+- Final exam
+- Pre-test & post-test
+- Assessment sebelum akses lab tertentu
+
+### Monitoring & Tracking Progres
+
+- Melihat performa peserta
+- Menganalisis kelemahan materi
+- Mengukur tingkat kelulusan
+- Membuat laporan akademik terpusat
+
+### Secure Assessment System
+
+- Timed exam system
+- Randomisasi soal
+- Auto grading
+- Session validation
+- Single submit enforcement
+- Secure database handling
+
+---
+
+## Posisi Examora dalam Ekosistem IDS
+
+```
+Materi → Examora (Validasi Teori) → Lab / CTF → Final Assessment → Certification
+```
+
+Examora berfungsi sebagai **validation layer** antara teori dan praktik.
+
+---
 
 ## Technology Stack
 
@@ -32,6 +80,9 @@ Examora is a comprehensive online examination system designed for schools, corpo
 | Database | MySQL 8.0+ / MariaDB |
 | Frontend | HTML5, CSS3, Bootstrap 5 |
 | Build Tool | Maven |
+| Container | Docker & Docker Compose |
+
+---
 
 ## Quick Start
 
@@ -40,9 +91,26 @@ Examora is a comprehensive online examination system designed for schools, corpo
 - Java Development Kit (JDK) 11 or higher
 - Apache Maven 3.6+
 - MySQL 8.0+ or MariaDB
-- Apache Tomcat 10+
+- Apache Tomcat 10+ (or Docker)
 
-### Installation
+### Installation with Docker (Recommended)
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Re-xist/examora.git
+   cd examora
+   ```
+
+2. **Run with Docker Compose**
+   ```bash
+   docker-compose up -d --build
+   ```
+
+3. **Access the application**
+
+   Open your browser and navigate to: `http://localhost:8888`
+
+### Manual Installation
 
 1. **Clone the repository**
    ```bash
@@ -57,7 +125,7 @@ Examora is a comprehensive online examination system designed for schools, corpo
 
 3. **Configure database connection**
 
-   Edit `src/main/resources/db.properties` or update `src/main/webapp/WEB-INF/web.xml`:
+   Edit `src/main/resources/db.properties`:
    ```properties
    db.url=jdbc:mysql://localhost:3306/examora_db
    db.username=root
@@ -83,14 +151,7 @@ Examora is a comprehensive online examination system designed for schools, corpo
 
    Open your browser and navigate to: `http://localhost:8080/examora`
 
-## Default Credentials
-
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@examora.com | admin123 |
-| User | user@examora.com | user123 |
-
-> **Important**: Change the default passwords in production!
+---
 
 ## Project Structure
 
@@ -114,39 +175,25 @@ Examora/
 │   │       └── WEB-INF/       # Web configuration
 │   └── test/                  # Test classes
 ├── sql/                       # Database scripts
+├── docker-compose.yml         # Docker configuration
+├── Dockerfile                 # Docker build file
 ├── pom.xml                    # Maven configuration
 └── README.md                  # This file
 ```
 
-## API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/LoginServlet` | GET/POST | User authentication |
-| `/RegisterServlet` | GET/POST | User registration |
-| `/LogoutServlet` | GET/POST | User logout |
-| `/QuizServlet` | GET/POST | Quiz CRUD operations |
-| `/QuestionServlet` | GET/POST | Question management |
-| `/ExamServlet` | GET/POST | Exam taking operations |
-| `/AdminServlet` | GET/POST | Admin dashboard |
-
-## Database Schema
-
-- **users**: User accounts (admin/peserta)
-- **quiz**: Quiz/exam definitions
-- **questions**: Multiple choice questions
-- **submissions**: User exam submissions
-- **answers**: Individual question answers
-- **quiz_sessions**: Active exam sessions
+---
 
 ## Security Features
 
 - Password hashing (SHA-256 with salt)
 - SQL injection prevention (Prepared Statements)
 - XSS prevention (Input sanitization)
-- CSRF token protection
 - Session management
 - Role-based access control
+- Quiz deadline validation
+- Timezone-aware timestamp handling
+
+---
 
 ## Contributing
 
@@ -156,17 +203,19 @@ Examora/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+---
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Support & Contribution
 
-## Support
+Jika Anda ingin mendukung pengembangan berkelanjutan platform Examora, Anda dapat memberikan dukungan melalui:
 
-For support, email support@examora.com or join our Discord channel.
+| | |
+|---|---|
+| **Support Page** | [https://saweria.co/rexist](https://saweria.co/rexist) |
 
-## Author
+Dukungan Anda akan membantu pengembangan fitur baru, peningkatan keamanan sistem, dan inovasi platform assessment di masa depan.
 
-**Re-xist** - [GitHub](https://github.com/Re-xist)
+---
 
 ## License
 
@@ -174,6 +223,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+## Developer & Repository
+
+| | |
+|---|---|
+| **Developer** | Re-xist |
+| **Repository** | [https://github.com/Re-xist](https://github.com/Re-xist) |
+
+Seluruh pengembangan sistem mengikuti prinsip **clean architecture**, **secure coding practice**, dan **production-ready deployment standard**.
+
+---
+
 **Examora** - Empowering Education Through Technology
 
-Made with ❤️ by [Re-xist](https://github.com/Re-xist)
+Made with love by [Re-xist](https://github.com/Re-xist)

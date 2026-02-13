@@ -167,6 +167,14 @@ public class ExamServlet extends HttpServlet {
         User user = (User) request.getSession().getAttribute("user");
 
         Quiz quiz = quizService.getQuizById(quizId);
+
+        // Check if quiz has expired (past deadline)
+        if (quiz.isExpired()) {
+            request.setAttribute("error", "Quiz sudah melewati deadline (" + quiz.getFormattedDeadline() + ")");
+            listAvailableQuizzes(request, response);
+            return;
+        }
+
         List<Question> questions = submissionService.getQuestionsForExam(quizId);
         Submission submission = submissionService.getUserSubmission(user.getId(), quizId);
 

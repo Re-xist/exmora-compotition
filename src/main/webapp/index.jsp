@@ -14,8 +14,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examora - Smart Assessment Platform</title>
-    <meta name="description" content="Modern, Secure, and Scalable Online Examination System">
+    <title>Examora - Secure Assessment Platform</title>
+    <meta name="description" content="Official Secure Assessment Platform by IDS Cyber Security Academy">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
@@ -58,14 +58,19 @@
         <div class="container">
             <div class="row align-items-center min-vh-100">
                 <div class="col-lg-6">
+                    <span class="badge bg-warning text-dark mb-3">IDS Cyber Security Academy</span>
                     <h1 class="display-4 fw-bold text-white mb-4">
                         Examora
-                        <span class="d-block text-warning">Smart Assessment Platform</span>
+                        <span class="d-block text-warning">Secure Assessment Platform</span>
                     </h1>
                     <p class="lead text-white-50 mb-4">
-                        Modern, Secure, and Scalable Online Examination System.
-                        Platform ujian online modern yang aman dan dapat diandalkan untuk
-                        sekolah, corporate training, dan sertifikasi.
+                        Platform ujian dan sistem evaluasi resmi untuk mengukur, memvalidasi,
+                        dan mendokumentasikan kompetensi peserta secara terstruktur.
+                    </p>
+                    <p class="text-white-50 mb-4">
+                        Examora dirancang sebagai <strong>Secure Online Assessment System</strong>
+                        yang memastikan setiap peserta memahami konsep keamanan siber sebelum
+                        melanjutkan ke tahap praktik dan eksploitasi di lab.
                     </p>
                     <div class="d-flex gap-3">
                         <a href="RegisterServlet" class="btn btn-warning btn-lg px-4">
@@ -78,7 +83,7 @@
                 </div>
                 <div class="col-lg-6 text-center">
                     <div class="hero-illustration">
-                        <i class="bi bi-journal-richtext" style="font-size: 15rem; color: rgba(255,255,255,0.2);"></i>
+                        <i class="bi bi-shield-lock" style="font-size: 12rem; color: rgba(255,255,255,0.2);"></i>
                     </div>
                 </div>
             </div>
@@ -90,18 +95,19 @@
         <div class="container py-5">
             <div class="text-center mb-5">
                 <h2 class="display-6 fw-bold">Fitur Unggulan</h2>
-                <p class="text-muted">Semua yang Anda butuhkan untuk sistem ujian online</p>
+                <p class="text-muted">Secure Assessment System dengan fitur lengkap</p>
             </div>
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="feature-icon bg-primary text-white rounded-circle mb-3 mx-auto">
-                                <i class="bi bi-speedometer2"></i>
+                                <i class="bi bi-bullseye"></i>
                             </div>
-                            <h5 class="card-title">Auto Koreksi</h5>
+                            <h5 class="card-title">Validasi Kompetensi</h5>
                             <p class="card-text text-muted">
-                                Sistem koreksi otomatis yang cepat dan akurat dengan perhitungan skor real-time.
+                                Memastikan peserta memahami konsep keamanan siber, OWASP Top 10,
+                                dan metodologi penetration testing.
                             </p>
                         </div>
                     </div>
@@ -112,9 +118,10 @@
                             <div class="feature-icon bg-success text-white rounded-circle mb-3 mx-auto">
                                 <i class="bi bi-shield-check"></i>
                             </div>
-                            <h5 class="card-title">Aman & Terpercaya</h5>
+                            <h5 class="card-title">Secure Assessment</h5>
                             <p class="card-text text-muted">
-                                Password hashing, CSRF protection, dan session management yang aman.
+                                Timed exam system, session validation, single submit enforcement,
+                                dan secure database handling.
                             </p>
                         </div>
                     </div>
@@ -125,9 +132,10 @@
                             <div class="feature-icon bg-info text-white rounded-circle mb-3 mx-auto">
                                 <i class="bi bi-stopwatch"></i>
                             </div>
-                            <h5 class="card-title">Timer Ujian</h5>
+                            <h5 class="card-title">Timer & Deadline</h5>
                             <p class="card-text text-muted">
-                                Timer dengan countdown dan auto-submit saat waktu habis.
+                                Timer countdown dengan auto-submit dan deadline quiz
+                                dengan format waktu WIB (Jakarta).
                             </p>
                         </div>
                     </div>
@@ -138,9 +146,10 @@
                             <div class="feature-icon bg-warning text-white rounded-circle mb-3 mx-auto">
                                 <i class="bi bi-graph-up"></i>
                             </div>
-                            <h5 class="card-title">Dashboard Statistik</h5>
+                            <h5 class="card-title">Monitoring Progres</h5>
                             <p class="card-text text-muted">
-                                Lihat rata-rata nilai, distribusi skor, dan performa peserta.
+                                Melihat performa peserta, menganalisis kelemahan materi,
+                                dan membuat laporan akademik terpusat.
                             </p>
                         </div>
                     </div>
@@ -149,11 +158,12 @@
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="feature-icon bg-danger text-white rounded-circle mb-3 mx-auto">
-                                <i class="bi bi-people"></i>
+                                <i class="bi bi-clipboard-check"></i>
                             </div>
-                            <h5 class="card-title">Multi-Role</h5>
+                            <h5 class="card-title">Auto Grading</h5>
                             <p class="card-text text-muted">
-                                Sistem role admin dan peserta dengan akses yang berbeda.
+                                Koreksi otomatis dengan perhitungan skor real-time dan
+                                hasil yang akurat.
                             </p>
                         </div>
                     </div>
@@ -162,11 +172,11 @@
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="feature-icon bg-secondary text-white rounded-circle mb-3 mx-auto">
-                                <i class="bi bi-phone"></i>
+                                <i class="bi bi-people"></i>
                             </div>
-                            <h5 class="card-title">Responsive Design</h5>
+                            <h5 class="card-title">Multi-Role System</h5>
                             <p class="card-text text-muted">
-                                Tampilan yang optimal di desktop, tablet, dan smartphone.
+                                Sistem role admin dan peserta dengan akses dan fitur yang berbeda.
                             </p>
                         </div>
                     </div>
@@ -180,51 +190,52 @@
         <div class="container py-5">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h2 class="display-6 fw-bold mb-4">Tentang Examora</h2>
+                    <h2 class="display-6 fw-bold mb-4">Posisi dalam Ekosistem IDS</h2>
                     <p class="lead text-muted mb-4">
-                        Examora adalah platform ujian online yang dirancang untuk kebutuhan
-                        modern dengan fokus pada keamanan, kecepatan, dan kemudahan penggunaan.
+                        Examora berfungsi sebagai <strong>validation layer</strong> antara
+                        teori dan praktik dalam struktur pembelajaran IDS.
                     </p>
+                    <div class="card bg-light border-0 mb-4">
+                        <div class="card-body">
+                            <code class="text-primary">
+                                Materi &rarr; <strong>Examora</strong> &rarr; Lab/CTF &rarr; Final Assessment &rarr; Certification
+                            </code>
+                        </div>
+                    </div>
+                    <h5 class="mb-3">Nilai Strategis:</h5>
                     <ul class="list-unstyled">
                         <li class="mb-3">
                             <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            Cocok untuk ujian sekolah dan tryout
+                            Peserta tidak hanya menggunakan tools, tapi memahami logic serangan
                         </li>
                         <li class="mb-3">
                             <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            Ideal untuk corporate training dan sertifikasi
+                            Proses evaluasi objektif dan transparan
                         </li>
                         <li class="mb-3">
                             <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            Siap untuk deployment produksi
+                            Standar kompetensi tetap terjaga
                         </li>
                         <li class="mb-3">
                             <i class="bi bi-check-circle-fill text-success me-2"></i>
-                            Arsitektur yang scalable dan maintainable
+                            Kualitas lulusan cyber security terjamin
                         </li>
                     </ul>
                 </div>
                 <div class="col-lg-6">
                     <div class="card border-0 shadow-lg">
                         <div class="card-body p-5">
-                            <h4 class="mb-4">Default Login</h4>
-                            <div class="mb-3">
-                                <strong>Admin:</strong>
-                                <ul class="mt-2 mb-3">
-                                    <li>Email: admin@examora.com</li>
-                                    <li>Password: admin123</li>
-                                </ul>
-                            </div>
-                            <div class="mb-3">
-                                <strong>Peserta:</strong>
-                                <ul class="mt-2">
-                                    <li>Email: user@examora.com</li>
-                                    <li>Password: user123</li>
-                                </ul>
-                            </div>
+                            <h4 class="mb-4">Mulai Sekarang</h4>
+                            <p class="text-muted mb-4">
+                                Masuk ke akun Anda untuk mulai mengerjakan quiz atau mengelola ujian.
+                            </p>
                             <a href="LoginServlet" class="btn btn-primary w-100">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>Login Sekarang
                             </a>
+                            <hr class="my-4">
+                            <p class="text-center text-muted mb-0">
+                                Belum punya akun? <a href="RegisterServlet">Daftar di sini</a>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -238,11 +249,17 @@
             <div class="row">
                 <div class="col-md-6">
                     <h5><i class="bi bi-journal-check me-2"></i>Examora</h5>
+                    <p class="text-muted mb-1">
+                        Official Secure Assessment Platform
+                    </p>
                     <p class="text-muted mb-0">
-                        Modern, Secure, and Scalable Online Examination System
+                        <small>IDS Cyber Security Academy</small>
                     </p>
                 </div>
                 <div class="col-md-6 text-md-end">
+                    <p class="mb-1">
+                        <small>Developer: <a href="https://github.com/Re-xist" class="text-warning">Re-xist</a></small>
+                    </p>
                     <p class="mb-0 text-muted">
                         &copy; 2024 Examora. All rights reserved.
                     </p>
