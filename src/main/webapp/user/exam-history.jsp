@@ -103,14 +103,14 @@
                             %>
                             <tr>
                                 <td><%= no++ %></td>
-                                <td><strong><%= sub.getQuizTitle() %></strong></td>
+                                <td><strong><%= sub.getQuizTitle() != null ? sub.getQuizTitle() : "Unknown Quiz" %></strong></td>
                                 <td>
                                     <span class="<%= scoreClass %> fw-bold">
-                                        <%= String.format("%.0f", sub.getScore()) %>
+                                        <%= sub.getScore() != null ? String.format("%.0f", sub.getScore()) : "0" %>
                                     </span>
                                 </td>
-                                <td><%= sub.getCorrectAnswers() %>/<%= sub.getTotalQuestions() %></td>
-                                <td><%= sub.getFormattedTimeSpent() %></td>
+                                <td><%= sub.getCorrectAnswers() != null ? sub.getCorrectAnswers() : 0 %>/<%= sub.getTotalQuestions() != null ? sub.getTotalQuestions() : 0 %></td>
+                                <td><%= sub.getFormattedTimeSpent() != null ? sub.getFormattedTimeSpent() : "-" %></td>
                                 <td><%= sub.getSubmittedAt() != null ? sub.getSubmittedAt().toLocalDate() : "-" %></td>
                                 <td>
                                     <% if ("completed".equals(sub.getStatus())) { %>
