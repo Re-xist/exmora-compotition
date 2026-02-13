@@ -95,6 +95,13 @@ public class ArenaServlet extends HttpServlet {
                     throw new ServletException(ex);
                 }
             }
+        } catch (QuizService.ServiceException e) {
+            request.setAttribute("error", e.getMessage());
+            try {
+                listArenas(request, response);
+            } catch (ArenaService.ServiceException ex) {
+                throw new ServletException(ex);
+            }
         }
     }
 
@@ -140,7 +147,7 @@ public class ArenaServlet extends HttpServlet {
                 if ("create".equals(action)) {
                     try {
                         showCreateForm(request, response);
-                    } catch (ArenaService.ServiceException ex) {
+                    } catch (ArenaService.ServiceException | QuizService.ServiceException ex) {
                         throw new ServletException(ex);
                     }
                 } else if ("join".equals(action)) {
@@ -174,7 +181,7 @@ public class ArenaServlet extends HttpServlet {
     }
 
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, ArenaService.ServiceException {
+            throws ServletException, IOException, ArenaService.ServiceException, QuizService.ServiceException {
         User user = (User) request.getSession().getAttribute("user");
 
         // Get quizzes for selection
