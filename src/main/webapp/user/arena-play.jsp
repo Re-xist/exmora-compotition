@@ -199,7 +199,7 @@
         const sessionId = <%= arenaSession.getId() %>;
         const participantId = <%= participant.getId() %>;
         const userId = <%= currentUser.getId() %>;
-        const userName = '<%= currentUser.getName() %>';
+        const userName = <%= new com.google.gson.Gson().toJson(currentUser.getName()) %>;
         const questionTime = <%= arenaSession.getQuestionTime() %>;
         const currentQuestionId = <%= currentQuestion != null ? currentQuestion.getId() : 0 %>;
 

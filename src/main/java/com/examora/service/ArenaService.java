@@ -390,33 +390,40 @@ public class ArenaService {
     /**
      * Calculate score based on correctness and speed
      * Formula: Base Point * (remaining_time / total_time) if correct, 0 if wrong
+     * Minimum score for correct answer is 10 points
      */
     public int calculateScore(String selectedAnswer, String correctAnswer,
                               Integer timeTakenMs, Integer totalTimeSeconds) {
-        // Check if answer is correct
+        // Check if answer is correct - return 0 for wrong answers
         if (selectedAnswer == null || correctAnswer == null ||
             !selectedAnswer.equalsIgnoreCase(correctAnswer)) {
             return 0;
         }
 
+        // Validate time parameters
+        if (totalTimeSeconds == null || totalTimeSeconds <= 0) {
+            // If time is invalid, give base minimum score for correct answer
+            return 10;
+        }
+
         // Convert time to same unit (milliseconds)
         long totalTimeMs = totalTimeSeconds * 1000L;
-        long timeTaken = timeTakenMs != null ? timeTakenMs : 0;
+        long timeTaken = timeTakenMs != null && timeTakenMs > 0 ? timeTakenMs : 0;
 
-        // Calculate remaining time
-        long remainingTime = totalTimeMs - timeTaken;
-        if (remainingTime < 0) {
-            remainingTime = 0;
-        }
+        // Calculate remaining time (ensure non-negative)
+        long remainingTime = Math.max(0, totalTimeMs - timeTaken);
 
         // Calculate speed multiplier (0.0 - 1.0)
         double speedMultiplier = (double) remainingTime / totalTimeMs;
 
+        // Ensure speed multiplier is within valid range
+        speedMultiplier = Math.max(0.0, Math.min(1.0, speedMultiplier));
+
         // Calculate final score
         int score = (int) (BASE_POINT * speedMultiplier);
 
-        // Minimum score for correct answer (10 points)
-        return Math.max(score, 10);
+        // Minimum score for correct answer (10 points), maximum is BASE_POINT
+        return Math.max(10, Math.min(score, BASE_POINT));
     }
 
     /**

@@ -349,6 +349,10 @@ public class ArenaServlet extends HttpServlet {
     private void startArena(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ArenaService.ServiceException {
         String idStr = request.getParameter("id");
+        if (idStr == null || idStr.isEmpty()) {
+            sendJsonError(response, "Arena ID diperlukan");
+            return;
+        }
         Integer id = Integer.parseInt(idStr);
 
         User user = (User) request.getSession().getAttribute("user");
@@ -360,6 +364,10 @@ public class ArenaServlet extends HttpServlet {
     private void pauseArena(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ArenaService.ServiceException {
         String idStr = request.getParameter("id");
+        if (idStr == null || idStr.isEmpty()) {
+            sendJsonError(response, "Arena ID diperlukan");
+            return;
+        }
         Integer id = Integer.parseInt(idStr);
 
         User user = (User) request.getSession().getAttribute("user");
@@ -371,6 +379,10 @@ public class ArenaServlet extends HttpServlet {
     private void resumeArena(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ArenaService.ServiceException {
         String idStr = request.getParameter("id");
+        if (idStr == null || idStr.isEmpty()) {
+            sendJsonError(response, "Arena ID diperlukan");
+            return;
+        }
         Integer id = Integer.parseInt(idStr);
 
         User user = (User) request.getSession().getAttribute("user");
@@ -382,6 +394,10 @@ public class ArenaServlet extends HttpServlet {
     private void endArena(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ArenaService.ServiceException {
         String idStr = request.getParameter("id");
+        if (idStr == null || idStr.isEmpty()) {
+            sendJsonError(response, "Arena ID diperlukan");
+            return;
+        }
         Integer id = Integer.parseInt(idStr);
 
         User user = (User) request.getSession().getAttribute("user");
@@ -393,6 +409,10 @@ public class ArenaServlet extends HttpServlet {
     private void nextQuestion(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, ArenaService.ServiceException {
         String idStr = request.getParameter("id");
+        if (idStr == null || idStr.isEmpty()) {
+            sendJsonError(response, "Arena ID diperlukan");
+            return;
+        }
         Integer id = Integer.parseInt(idStr);
 
         User user = (User) request.getSession().getAttribute("user");
@@ -409,10 +429,28 @@ public class ArenaServlet extends HttpServlet {
         String answer = request.getParameter("answer");
         String timeTakenStr = request.getParameter("timeTaken");
 
+        // Validate required parameters
+        if (sessionIdStr == null || sessionIdStr.isEmpty()) {
+            sendJsonError(response, "Session ID diperlukan");
+            return;
+        }
+        if (participantIdStr == null || participantIdStr.isEmpty()) {
+            sendJsonError(response, "Participant ID diperlukan");
+            return;
+        }
+        if (questionIdStr == null || questionIdStr.isEmpty()) {
+            sendJsonError(response, "Question ID diperlukan");
+            return;
+        }
+        if (answer == null || answer.isEmpty()) {
+            sendJsonError(response, "Jawaban diperlukan");
+            return;
+        }
+
         Integer sessionId = Integer.parseInt(sessionIdStr);
         Integer participantId = Integer.parseInt(participantIdStr);
         Integer questionId = Integer.parseInt(questionIdStr);
-        Integer timeTaken = timeTakenStr != null ? Integer.parseInt(timeTakenStr) : 0;
+        Integer timeTaken = timeTakenStr != null && !timeTakenStr.isEmpty() ? Integer.parseInt(timeTakenStr) : 0;
 
         ArenaAnswer arenaAnswer = arenaService.submitAnswer(sessionId, participantId, questionId, answer, timeTaken);
 

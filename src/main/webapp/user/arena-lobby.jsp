@@ -146,7 +146,7 @@
         const sessionId = <%= arenaSession.getId() %>;
         const participantId = <%= participant.getId() %>;
         const userId = <%= currentUser.getId() %>;
-        const userName = '<%= currentUser.getName() %>';
+        const userName = <%= new com.google.gson.Gson().toJson(currentUser.getName()) %>;
         let websocket;
 
         function initWebSocket() {

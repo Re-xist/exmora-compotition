@@ -149,16 +149,38 @@ public class ArenaWebSocket {
 
     private void handleJoin(Session session, Integer sessionId, JsonObject json) {
         try {
+            // Validate required fields
+            if (!json.has("participantId") || !json.has("userId")) {
+                sendError(session, "Missing required fields: participantId and userId");
+                return;
+            }
+
             Integer participantId = json.get("participantId").getAsInt();
             Integer userId = json.get("userId").getAsInt();
             String userName = json.has("userName") ? json.get("userName").getAsString() : "Unknown";
+
+            // SECURITY: Verify that the participant exists and belongs to this session
+            ArenaParticipant participant = arenaService.getParticipant(sessionId, userId);
+            if (participant == null) {
+                sendError(session, "Unauthorized: You are not a participant in this arena");
+                logger.warning("Unauthorized join attempt: sessionId=" + sessionId + ", userId=" + userId);
+                return;
+            }
+
+            // SECURITY: Verify participantId matches
+            if (!participant.getId().equals(participantId)) {
+                sendError(session, "Invalid participant ID");
+                logger.warning("Invalid participantId: expected=" + participant.getId() + ", got=" + participantId);
+                return;
+            }
 
             // Store participant info
             ParticipantInfo info = new ParticipantInfo();
             info.participantId = participantId;
             info.userId = userId;
-            info.userName = userName;
+            info.userName = participant.getUserName() != null ? participant.getUserName() : userName;
             info.sessionId = sessionId;
+            info.authenticated = true;
             participantInfoMap.put(session.getId(), info);
 
             // Update connection status
@@ -185,8 +207,14 @@ public class ArenaWebSocket {
     private void handleAnswer(Session session, Integer sessionId, JsonObject json) {
         try {
             ParticipantInfo info = participantInfoMap.get(session.getId());
-            if (info == null) {
-                sendError(session, "Not joined");
+            if (info == null || !info.authenticated) {
+                sendError(session, "Not authenticated. Please join first.");
+                return;
+            }
+
+            // Validate required fields
+            if (!json.has("questionId") || !json.has("answer")) {
+                sendError(session, "Missing required fields: questionId and answer");
                 return;
             }
 
@@ -220,7 +248,25 @@ public class ArenaWebSocket {
 
     private void handleStart(Session session, Integer sessionId, JsonObject json) {
         try {
+            // Validate hostId is provided
+            if (!json.has("hostId")) {
+                sendError(session, "Missing hostId");
+                return;
+            }
+
             Integer hostId = json.get("hostId").getAsInt();
+
+            // SECURITY: Verify the session exists and the user is the host
+            ArenaSession arenaSession = arenaService.getSessionById(sessionId);
+            if (arenaSession == null) {
+                sendError(session, "Session not found");
+                return;
+            }
+            if (!arenaSession.getHostId().equals(hostId)) {
+                sendError(session, "Unauthorized: Only the host can start the session");
+                logger.warning("Unauthorized start attempt: sessionId=" + sessionId + ", hostId=" + hostId);
+                return;
+            }
 
             arenaService.startSession(sessionId, hostId);
 
@@ -241,7 +287,19 @@ public class ArenaWebSocket {
 
     private void handlePause(Session session, Integer sessionId, JsonObject json) {
         try {
+            if (!json.has("hostId")) {
+                sendError(session, "Missing hostId");
+                return;
+            }
+
             Integer hostId = json.get("hostId").getAsInt();
+
+            // SECURITY: Verify the user is the host
+            ArenaSession arenaSession = arenaService.getSessionById(sessionId);
+            if (arenaSession == null || !arenaSession.getHostId().equals(hostId)) {
+                sendError(session, "Unauthorized: Only the host can pause the session");
+                return;
+            }
 
             arenaService.pauseSession(sessionId, hostId);
 
@@ -259,7 +317,19 @@ public class ArenaWebSocket {
 
     private void handleResume(Session session, Integer sessionId, JsonObject json) {
         try {
+            if (!json.has("hostId")) {
+                sendError(session, "Missing hostId");
+                return;
+            }
+
             Integer hostId = json.get("hostId").getAsInt();
+
+            // SECURITY: Verify the user is the host
+            ArenaSession arenaSession = arenaService.getSessionById(sessionId);
+            if (arenaSession == null || !arenaSession.getHostId().equals(hostId)) {
+                sendError(session, "Unauthorized: Only the host can resume the session");
+                return;
+            }
 
             arenaService.resumeSession(sessionId, hostId);
 
@@ -277,10 +347,22 @@ public class ArenaWebSocket {
 
     private void handleNext(Session session, Integer sessionId, JsonObject json) {
         try {
+            if (!json.has("hostId")) {
+                sendError(session, "Missing hostId");
+                return;
+            }
+
             Integer hostId = json.get("hostId").getAsInt();
 
-            // Get current session to check if we're at the last question
+            // SECURITY: Verify the user is the host
             ArenaSession arenaSession = arenaService.getSessionById(sessionId);
+            if (arenaSession == null || !arenaSession.getHostId().equals(hostId)) {
+                sendError(session, "Unauthorized: Only the host can advance questions");
+                return;
+            }
+
+            // Get current session to check if we're at the last question
+            arenaSession = arenaService.getSessionById(sessionId);
 
             arenaService.nextQuestion(sessionId, hostId);
 
@@ -305,7 +387,19 @@ public class ArenaWebSocket {
 
     private void handleEnd(Session session, Integer sessionId, JsonObject json) {
         try {
+            if (!json.has("hostId")) {
+                sendError(session, "Missing hostId");
+                return;
+            }
+
             Integer hostId = json.get("hostId").getAsInt();
+
+            // SECURITY: Verify the user is the host
+            ArenaSession arenaSession = arenaService.getSessionById(sessionId);
+            if (arenaSession == null || !arenaSession.getHostId().equals(hostId)) {
+                sendError(session, "Unauthorized: Only the host can end the session");
+                return;
+            }
 
             arenaService.endSession(sessionId, hostId);
 
@@ -418,5 +512,6 @@ public class ArenaWebSocket {
         Integer userId;
         String userName;
         Integer sessionId;
+        boolean authenticated = false;
     }
 }

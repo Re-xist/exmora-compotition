@@ -305,7 +305,7 @@
                     type: 'join',
                     participantId: 0, // Host doesn't have participant ID
                     userId: hostId,
-                    userName: '<%= currentUser.getName() %>'
+                    userName: <%= new com.google.gson.Gson().toJson(currentUser.getName()) %>
                 }));
             };
 
