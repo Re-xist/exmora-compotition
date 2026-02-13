@@ -373,6 +373,8 @@ public class ArenaService {
                                                  selectedAnswer, timeTaken);
             answer.setScoreEarned(scoreEarned);
             answer.setCorrectAnswer(question.getCorrectAnswer());
+            answer.setIsCorrect(selectedAnswer != null &&
+                              selectedAnswer.equalsIgnoreCase(question.getCorrectAnswer()));
 
             answerDAO.create(answer);
 

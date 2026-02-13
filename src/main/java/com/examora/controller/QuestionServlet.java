@@ -147,11 +147,17 @@ public class QuestionServlet extends HttpServlet {
         String optionC = request.getParameter("optionC");
         String optionD = request.getParameter("optionD");
         String correctAnswer = request.getParameter("correctAnswer");
+        String saveAndAdd = request.getParameter("saveAndAdd");
 
         quizService.addQuestion(quizId, questionText, optionA, optionB, optionC, optionD, correctAnswer);
 
-        request.setAttribute("success", "Pertanyaan berhasil ditambahkan");
-        response.sendRedirect(request.getContextPath() + "/QuestionServlet?action=list&quizId=" + quizId);
+        if ("true".equals(saveAndAdd)) {
+            // Redirect back to create form for adding more questions
+            response.sendRedirect(request.getContextPath() + "/QuestionServlet?action=create&quizId=" + quizId + "&success=true");
+        } else {
+            request.setAttribute("success", "Pertanyaan berhasil ditambahkan");
+            response.sendRedirect(request.getContextPath() + "/QuestionServlet?action=list&quizId=" + quizId);
+        }
     }
 
     private void updateQuestion(HttpServletRequest request, HttpServletResponse response, Integer quizId)

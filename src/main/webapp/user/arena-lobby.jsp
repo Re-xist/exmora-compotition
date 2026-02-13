@@ -102,14 +102,14 @@
                 <!-- Participants List -->
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-people me-2"></i>Peserta (<%= arenaSession.getParticipantCount() %>)</h5>
+                        <h5 class="mb-0"><i class="bi bi-people me-2"></i>Peserta (<span id="participantCount"><%= arenaSession.getParticipantCount() %></span>)</h5>
                         <span class="badge bg-arena">Waiting</span>
                     </div>
                     <div class="card-body p-0">
                         <div id="participantsList" class="list-group list-group-flush">
                             <% if (participants != null && !participants.isEmpty()) {
                                 for (ArenaParticipant p : participants) { %>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="list-group-item d-flex justify-content-between align-items-center" id="participant-<%= p.getId() %>">
                                 <div class="d-flex align-items-center">
                                     <div class="bg-arena-gradient text-white rounded-circle d-flex align-items-center justify-content-center me-3"
                                          style="width: 40px; height: 40px;">
@@ -130,7 +130,7 @@
                             </div>
                             <% }
                             } else { %>
-                            <div class="text-center py-4 text-muted">
+                            <div class="text-center py-4 text-muted" id="noParticipantsMsg">
                                 Belum ada peserta lain
                             </div>
                             <% } %>
@@ -202,6 +202,14 @@
         }
 
         function addParticipantToList(data) {
+            // Remove "no participants" message if exists
+            const noMsg = document.getElementById('noParticipantsMsg');
+            if (noMsg) noMsg.remove();
+
+            // Check if participant already in list
+            const existing = document.getElementById('participant-' + data.participantId);
+            if (existing) return;
+
             const list = document.getElementById('participantsList');
             const html = `
                 <div class="list-group-item d-flex justify-content-between align-items-center" id="participant-${data.participantId}">
@@ -221,11 +229,23 @@
                 </div>
             `;
             list.insertAdjacentHTML('beforeend', html);
+
+            // Update participant count
+            updateParticipantCount(1);
         }
 
         function removeParticipantFromList(data) {
-            const element = document.getElementById(`participant-${data.participantId}`);
-            if (element) element.remove();
+            const element = document.getElementById('participant-' + data.participantId);
+            if (element) {
+                element.remove();
+                updateParticipantCount(-1);
+            }
+        }
+
+        function updateParticipantCount(delta) {
+            const countEl = document.getElementById('participantCount');
+            const currentCount = parseInt(countEl.textContent) || 0;
+            countEl.textContent = currentCount + delta;
         }
 
         // Initialize

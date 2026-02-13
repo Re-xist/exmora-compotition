@@ -140,24 +140,38 @@ public class ArenaServlet extends HttpServlet {
                     listArenas(request, response);
             }
         } catch (ArenaService.ServiceException e) {
-            if (isApiRequest(action)) {
-                sendJsonError(response, e.getMessage());
+            handleServiceException(request, response, action, e);
+        } catch (NumberFormatException e) {
+            handleServiceException(request, response, action,
+                new ArenaService.ServiceException("Format data tidak valid: " + e.getMessage()));
+        } catch (Exception e) {
+            // Log unexpected errors
+            e.printStackTrace();
+            handleServiceException(request, response, action,
+                new ArenaService.ServiceException("Terjadi kesalahan pada server"));
+        }
+    }
+
+    private void handleServiceException(HttpServletRequest request, HttpServletResponse response,
+                                        String action, ArenaService.ServiceException e)
+            throws ServletException, IOException {
+        if (isApiRequest(action)) {
+            sendJsonError(response, e.getMessage());
+        } else {
+            request.setAttribute("error", e.getMessage());
+            if ("create".equals(action)) {
+                try {
+                    showCreateForm(request, response);
+                } catch (ArenaService.ServiceException | QuizService.ServiceException ex) {
+                    throw new ServletException(ex);
+                }
+            } else if ("join".equals(action)) {
+                showJoinForm(request, response);
             } else {
-                request.setAttribute("error", e.getMessage());
-                if ("create".equals(action)) {
-                    try {
-                        showCreateForm(request, response);
-                    } catch (ArenaService.ServiceException | QuizService.ServiceException ex) {
-                        throw new ServletException(ex);
-                    }
-                } else if ("join".equals(action)) {
-                    showJoinForm(request, response);
-                } else {
-                    try {
-                        listArenas(request, response);
-                    } catch (ArenaService.ServiceException ex) {
-                        throw new ServletException(ex);
-                    }
+                try {
+                    listArenas(request, response);
+                } catch (ArenaService.ServiceException ex) {
+                    throw new ServletException(ex);
                 }
             }
         }
@@ -326,11 +340,27 @@ public class ArenaServlet extends HttpServlet {
             throw new ArenaService.ServiceException("Quiz harus dipilih");
         }
 
-        Integer quizId = Integer.parseInt(quizIdStr);
-        Integer questionTime = questionTimeStr != null && !questionTimeStr.isEmpty() ?
-                Integer.parseInt(questionTimeStr) : 30;
+        Integer quizId;
+        Integer questionTime;
+
+        try {
+            quizId = Integer.parseInt(quizIdStr);
+        } catch (NumberFormatException e) {
+            throw new ArenaService.ServiceException("Quiz tidak valid");
+        }
+
+        try {
+            questionTime = questionTimeStr != null && !questionTimeStr.isEmpty() ?
+                    Integer.parseInt(questionTimeStr) : 30;
+        } catch (NumberFormatException e) {
+            questionTime = 30; // Default value
+        }
 
         User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/LoginServlet");
+            return;
+        }
 
         ArenaSession session = arenaService.createSession(quizId, user.getId(), questionTime);
 

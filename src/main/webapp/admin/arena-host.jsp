@@ -246,15 +246,15 @@
             <!-- Right Column - Participants & Leaderboard -->
             <div class="col-md-4">
                 <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Leaderboard</h5>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Peserta (<span id="participantCount"><%= arenaSession.getParticipantCount() %></span>)</h5>
                     </div>
                     <div class="card-body p-0">
                         <div id="leaderboardDisplay" class="list-group list-group-flush">
                             <% if (participants != null && !participants.isEmpty()) {
                                 int rank = 1;
                                 for (ArenaParticipant p : participants) { %>
-                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="list-group-item d-flex justify-content-between align-items-center" id="host-participant-<%= p.getId() %>">
                                 <div class="d-flex align-items-center">
                                     <span class="badge <%= rank == 1 ? "bg-warning text-dark" :
                                         rank == 2 ? "bg-secondary" : rank == 3 ? "bg-danger" : "bg-light text-dark" %> me-3" style="width: 30px;">
@@ -273,7 +273,7 @@
                             <% rank++;
                                 }
                             } else { %>
-                            <div class="text-center py-5 text-muted">
+                            <div class="text-center py-5 text-muted" id="noParticipantsHost">
                                 <i class="bi bi-people display-4 d-block mb-3"></i>
                                 <p>Belum ada peserta</p>
                             </div>
@@ -338,9 +338,11 @@
                     break;
                 case 'participantJoined':
                     showNotification(data.userName + ' bergabung', 'info');
+                    updateParticipantCount(1);
                     break;
                 case 'participantLeft':
                     showNotification(data.userName + ' keluar', 'warning');
+                    updateParticipantCount(-1);
                     break;
                 case 'sessionStarted':
                     showNotification('Arena dimulai!', 'success');
@@ -357,6 +359,12 @@
                     setTimeout(() => location.reload(), 1000);
                     break;
             }
+        }
+
+        function updateParticipantCount(delta) {
+            const countEl = document.getElementById('participantCount');
+            const currentCount = parseInt(countEl.textContent) || 0;
+            countEl.textContent = currentCount + delta;
         }
 
         function updateLeaderboard(participants) {

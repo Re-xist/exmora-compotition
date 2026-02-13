@@ -63,6 +63,69 @@
             cursor: not-allowed;
             opacity: 0.7;
         }
+
+        /* Winner Rank Styles */
+        .rank-1 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%) !important; }
+        .rank-2 { background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%) !important; }
+        .rank-3 { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%) !important; }
+        .rank-4 { background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%) !important; }
+        .rank-5 { background: linear-gradient(135deg, #06d6a0 0%, #05a87e 100%) !important; }
+
+        .winner-item {
+            color: white !important;
+        }
+        .winner-item .badge-rank {
+            background: rgba(255,255,255,0.3) !important;
+            color: white !important;
+        }
+        .winner-item small {
+            color: rgba(255,255,255,0.8) !important;
+        }
+
+        /* Leaderboard Animation */
+        .leaderboard-item {
+            transition: all 0.5s ease;
+        }
+        .leaderboard-item.rank-up {
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Score Animation */
+        .score-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: bold;
+            color: #06d6a0;
+            text-shadow: 0 0 20px rgba(6, 214, 160, 0.5);
+            animation: scorePopup 1.5s ease-out forwards;
+            z-index: 9999;
+        }
+        @keyframes scorePopup {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        .score-zero {
+            color: #ef476f;
+            text-shadow: 0 0 20px rgba(239, 71, 111, 0.5);
+        }
+
+        /* Trophy icon for top 3 */
+        .trophy-icon {
+            font-size: 1.2rem;
+            margin-right: 5px;
+        }
+        .trophy-gold { color: #FFD700; }
+        .trophy-silver { color: #C0C0C0; }
+        .trophy-bronze { color: #CD7F32; }
     </style>
 </head>
 <body class="bg-light">
@@ -75,9 +138,9 @@
                 <span class="badge bg-light text-dark ms-3"><%= arenaSession.getCode() %></span>
             </div>
             <div class="d-flex align-items-center">
-                <div class="text-white me-4">
+                <div class="text-white me-4 text-end">
                     <small>Skor Anda</small>
-                    <div class="fw-bold" id="myScore"><%= participant.getScore() %> pts</div>
+                    <div class="fw-bold fs-5" id="myScore"><%= participant.getScore() %> pts</div>
                 </div>
                 <span class="text-white">
                     <i class="bi bi-person-circle me-1"></i><%= currentUser.getName() %>
@@ -167,22 +230,31 @@
                         <div id="leaderboardList" class="list-group list-group-flush">
                             <% if (leaderboard != null && !leaderboard.isEmpty()) {
                                 int rank = 1;
-                                for (ArenaParticipant p : leaderboard) { %>
-                            <div class="list-group-item d-flex justify-content-between align-items-center <%= p.getUserId() == currentUser.getId() ? "bg-light" : "" %>">
+                                for (ArenaParticipant p : leaderboard) {
+                                    String rankClass = rank <= 5 ? "rank-" + rank + " winner-item" : "";
+                                    String trophyIcon = rank == 1 ? "<i class='bi bi-trophy-fill trophy-icon trophy-gold'></i>" :
+                                                       rank == 2 ? "<i class='bi bi-trophy-fill trophy-icon trophy-silver'></i>" :
+                                                       rank == 3 ? "<i class='bi bi-trophy-fill trophy-icon trophy-bronze'></i>" : "";
+                            %>
+                            <div class="list-group-item d-flex justify-content-between align-items-center leaderboard-item <%= rankClass %> <%= p.getUserId() == currentUser.getId() ? "border-primary border-2" : "" %>" data-rank="<%= rank %>">
                                 <div class="d-flex align-items-center">
-                                    <span class="badge <%= rank == 1 ? "bg-warning text-dark" :
-                                        rank == 2 ? "bg-secondary" : rank == 3 ? "bg-danger" : "bg-light text-dark border" %> me-3"
-                                          style="width: 30px;"><%= rank %></span>
+                                    <span class="badge <%= rank <= 5 ? "badge-rank" : rank == 1 ? "bg-warning text-dark" : rank == 2 ? "bg-secondary" : rank == 3 ? "bg-danger" : "bg-light text-dark border" %> me-3"
+                                          style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                        <%= rank %>
+                                    </span>
                                     <div>
-                                        <div class="fw-bold <%= p.getUserId() == currentUser.getId() ? "text-arena" : "" %>">
-                                            <%= p.getUserName() %>
+                                        <div class="fw-bold">
+                                            <%= trophyIcon %><%= p.getUserName() %>
                                             <% if (p.getUserId() == currentUser.getId()) { %>
-                                            <i class="bi bi-person-fill ms-1"></i>
+                                            <span class="badge bg-primary ms-1">Anda</span>
                                             <% } %>
                                         </div>
+                                        <% if (rank <= 5) { %>
+                                        <small><%= rank == 1 ? "Juara 1" : rank == 2 ? "Juara 2" : rank == 3 ? "Juara 3" : rank == 4 ? "Top 4" : "Top 5" %></small>
+                                        <% } %>
                                     </div>
                                 </div>
-                                <span class="badge bg-arena fs-6"><%= p.getScore() %> pts</span>
+                                <span class="badge <%= rank <= 5 ? "bg-white text-dark" : "bg-arena" %> fs-6"><%= p.getScore() %> pts</span>
                             </div>
                             <% rank++;
                                 }
@@ -212,6 +284,7 @@
         let myScore = <%= participant.getScore() %>;
         let hasAnswered = false;
         let questionStartTime = Date.now();
+        let timerRunning = false;
 
         function initWebSocket() {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -271,6 +344,8 @@
         }
 
         function startTimer() {
+            if (timerRunning) return;
+            timerRunning = true;
             timeRemaining = questionTime;
             questionStartTime = Date.now();
             hasAnswered = false;
@@ -281,7 +356,9 @@
                 updateTimerDisplay();
 
                 if (timeRemaining <= 0) {
+                    timeRemaining = 0;
                     clearInterval(timer);
+                    timerRunning = false;
                     timeUp();
                 }
             }, 1000);
@@ -289,9 +366,9 @@
 
         function updateTimerDisplay() {
             const timerEl = document.getElementById('timer');
-            timerEl.textContent = timeRemaining;
+            timerEl.textContent = Math.max(0, timeRemaining);
 
-            if (timeRemaining <= 5) {
+            if (timeRemaining <= 5 && timeRemaining > 0) {
                 timerEl.classList.add('warning');
             } else {
                 timerEl.classList.remove('warning');
@@ -299,7 +376,10 @@
         }
 
         function pauseTimer() {
-            if (timer) clearInterval(timer);
+            if (timer) {
+                clearInterval(timer);
+                timerRunning = false;
+            }
         }
 
         function resumeTimer() {
@@ -308,9 +388,10 @@
 
         function timeUp() {
             if (!hasAnswered) {
-                // Auto-submit with no answer
+                hasAnswered = true;
                 disableOptions();
                 showFeedback(false, null, 0);
+                showScorePopup(0);
             }
         }
 
@@ -319,6 +400,7 @@
 
             hasAnswered = true;
             clearInterval(timer);
+            timerRunning = false;
 
             const timeTaken = Date.now() - questionStartTime;
 
@@ -352,11 +434,11 @@
         function showAnswerFeedback(data) {
             const isCorrect = data.isCorrect;
             const correctAnswer = data.correctAnswer;
-            const scoreEarned = data.scoreEarned;
+            const scoreEarned = data.scoreEarned || 0;
 
             // Update my score
             myScore += scoreEarned;
-            document.getElementById('myScore').textContent = myScore + ' pts';
+            animateScore(myScore);
 
             // Show correct/incorrect
             document.querySelectorAll('.option-btn').forEach(btn => {
@@ -368,6 +450,29 @@
             });
 
             showFeedback(isCorrect, correctAnswer, scoreEarned);
+            showScorePopup(scoreEarned);
+        }
+
+        function showScorePopup(score) {
+            const popup = document.createElement('div');
+            popup.className = 'score-popup' + (score === 0 ? ' score-zero' : '');
+            popup.textContent = score > 0 ? '+' + score : '0';
+            document.body.appendChild(popup);
+
+            setTimeout(() => {
+                popup.remove();
+            }, 1500);
+        }
+
+        function animateScore(newScore) {
+            const scoreEl = document.getElementById('myScore');
+            scoreEl.style.transition = 'transform 0.3s ease';
+            scoreEl.style.transform = 'scale(1.2)';
+            scoreEl.textContent = newScore + ' pts';
+
+            setTimeout(() => {
+                scoreEl.style.transform = 'scale(1)';
+            }, 300);
         }
 
         function showFeedback(isCorrect, correctAnswer, scoreEarned) {
@@ -428,6 +533,7 @@
 
             // Reset state
             hasAnswered = false;
+            timerRunning = false;
             startTimer();
         }
 
@@ -437,24 +543,36 @@
             let html = '';
             participants.forEach((p, index) => {
                 const rank = index + 1;
-                const badgeClass = rank === 1 ? 'bg-warning text-dark' :
+                const rankClass = rank <= 5 ? 'rank-' + rank + ' winner-item' : '';
+                const badgeClass = rank <= 5 ? 'badge-rank' :
+                                   rank === 1 ? 'bg-warning text-dark' :
                                    rank === 2 ? 'bg-secondary' :
                                    rank === 3 ? 'bg-danger' : 'bg-light text-dark border';
                 const isMe = p.userId === userId;
-                const rowClass = isMe ? 'bg-light' : '';
+                const rowClass = isMe ? 'border-primary border-2' : '';
+
+                let trophyIcon = rank === 1 ? "<i class='bi bi-trophy-fill trophy-icon trophy-gold'></i>" :
+                                 rank === 2 ? "<i class='bi bi-trophy-fill trophy-icon trophy-silver'></i>" :
+                                 rank === 3 ? "<i class='bi bi-trophy-fill trophy-icon trophy-bronze'></i>" : '';
+
+                let rankLabel = rank <= 5 ?
+                    '<small>' + (rank === 1 ? 'Juara 1' : rank === 2 ? 'Juara 2' : rank === 3 ? 'Juara 3' : rank === 4 ? 'Top 4' : 'Top 5') + '</small>' : '';
 
                 html += `
-                    <div class="list-group-item d-flex justify-content-between align-items-center ${rowClass}">
+                    <div class="list-group-item d-flex justify-content-between align-items-center leaderboard-item ${rankClass} ${rowClass}" data-rank="${rank}">
                         <div class="d-flex align-items-center">
-                            <span class="badge ${badgeClass} me-3" style="width: 30px;">${rank}</span>
+                            <span class="badge ${badgeClass} me-3" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                ${rank}
+                            </span>
                             <div>
-                                <div class="fw-bold ${isMe ? 'text-arena' : ''}">
-                                    ${p.userName}
-                                    ${isMe ? '<i class="bi bi-person-fill ms-1"></i>' : ''}
+                                <div class="fw-bold">
+                                    ${trophyIcon}${p.userName}
+                                    ${isMe ? '<span class="badge bg-primary ms-1">Anda</span>' : ''}
                                 </div>
+                                ${rankLabel}
                             </div>
                         </div>
-                        <span class="badge bg-arena fs-6">${p.score} pts</span>
+                        <span class="badge ${rank <= 5 ? 'bg-white text-dark' : 'bg-arena'} fs-6">${p.score} pts</span>
                     </div>
                 `;
 
