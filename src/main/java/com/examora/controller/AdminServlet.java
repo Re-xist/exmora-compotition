@@ -367,12 +367,8 @@ public class AdminServlet extends HttpServlet {
      */
     private void downloadCsvTemplate(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/csv");
+        response.setContentType("text/csv; charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"template_import_user.csv\"");
-        response.setCharacterEncoding("UTF-8");
-
-        // Add BOM for Excel compatibility
-        response.getOutputStream().write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
 
         PrintWriter writer = response.getWriter();
 
@@ -385,6 +381,7 @@ public class AdminServlet extends HttpServlet {
         writer.println("Budi Pratama,budi.pratama@email.com,Password123,peserta,TI-2024");
 
         writer.flush();
+        writer.close();
     }
 
     /**
