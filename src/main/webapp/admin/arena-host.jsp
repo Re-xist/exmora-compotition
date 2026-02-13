@@ -374,6 +374,10 @@
                 return;
             }
 
+            // Remove "no participants" message if exists
+            const noMsg = document.getElementById('noParticipantsHost');
+            if (noMsg) noMsg.remove();
+
             let html = '';
             participants.forEach((p, index) => {
                 const rank = index + 1;
@@ -382,19 +386,20 @@
                                    rank === 3 ? 'bg-danger' : 'bg-light text-dark';
                 const statusClass = p.isConnected ? 'text-success' : 'text-danger';
                 const statusText = p.isConnected ? 'Online' : 'Offline';
+                const displayName = p.userName || p.user_name || 'Unknown';
 
                 html += `
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
                             <span class="badge ${badgeClass} me-3" style="width: 30px;">${rank}</span>
                             <div>
-                                <div class="fw-bold">${p.userName}</div>
+                                <div class="fw-bold">${displayName}</div>
                                 <small class="text-muted ${statusClass}">
                                     <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>${statusText}
                                 </small>
                             </div>
                         </div>
-                        <span class="badge bg-arena fs-6">${p.score} pts</span>
+                        <span class="badge bg-arena fs-6">${p.score != null ? p.score : 0} pts</span>
                     </div>
                 `;
             });

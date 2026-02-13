@@ -274,7 +274,6 @@
         const userName = <%= new com.google.gson.Gson().toJson(currentUser.getName()) %>;
         const contextPath = '<%= request.getContextPath() %>';
         const questionTime = <%= arenaSession.getQuestionTime() %>;
-        const currentQuestionId = <%= currentQuestion != null ? currentQuestion.getId() : 0 %>;
 
         let websocket;
         let timer;
@@ -285,6 +284,7 @@
         let hasAnswered = false;
         let questionStartTime = Date.now();
         let timerRunning = false;
+        let currentQuestionId = <%= currentQuestion != null ? currentQuestion.getId() : 0 %>;
 
         function initWebSocket() {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -504,6 +504,11 @@
             currentQuestionIndex = data.questionIndex;
             const question = data.data;
 
+            // IMPORTANT: Update currentQuestionId for answer submission
+            if (question.id) {
+                currentQuestionId = question.id;
+            }
+
             // Update UI
             document.getElementById('currentQuestionNum').textContent = currentQuestionIndex + 1;
             document.getElementById('progressBar').style.width = ((currentQuestionIndex + 1) * 100 / totalQuestions) + '%';
@@ -550,6 +555,7 @@
                                    rank === 3 ? 'bg-danger' : 'bg-light text-dark border';
                 const isMe = p.userId === userId;
                 const rowClass = isMe ? 'border-primary border-2' : '';
+                const displayName = p.userName || p.user_name || 'Unknown';
 
                 let trophyIcon = rank === 1 ? "<i class='bi bi-trophy-fill trophy-icon trophy-gold'></i>" :
                                  rank === 2 ? "<i class='bi bi-trophy-fill trophy-icon trophy-silver'></i>" :
@@ -566,19 +572,19 @@
                             </span>
                             <div>
                                 <div class="fw-bold">
-                                    ${trophyIcon}${p.userName}
+                                    ${trophyIcon}${displayName}
                                     ${isMe ? '<span class="badge bg-primary ms-1">Anda</span>' : ''}
                                 </div>
                                 ${rankLabel}
                             </div>
                         </div>
-                        <span class="badge ${rank <= 5 ? 'bg-white text-dark' : 'bg-arena'} fs-6">${p.score} pts</span>
+                        <span class="badge ${rank <= 5 ? 'bg-white text-dark' : 'bg-arena'} fs-6">${p.score != null ? p.score : 0} pts</span>
                     </div>
                 `;
 
                 // Update my score if it's me
                 if (isMe) {
-                    myScore = p.score;
+                    myScore = p.score || 0;
                     document.getElementById('myScore').textContent = myScore + ' pts';
                 }
             });
