@@ -30,6 +30,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="../assets/css/style.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
     <style>
         body { background-color: #f8f9fa; }
         .exam-header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: white; border-bottom: 2px solid #0d6efd; }
