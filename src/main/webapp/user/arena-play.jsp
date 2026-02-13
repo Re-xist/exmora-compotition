@@ -434,7 +434,7 @@
         function showAnswerFeedback(data) {
             const isCorrect = data.isCorrect;
             const correctAnswer = data.correctAnswer;
-            const scoreEarned = data.scoreEarned || 0;
+            const scoreEarned = data.scoreEarned != null ? data.scoreEarned : 0;
 
             // Update my score
             myScore += scoreEarned;
@@ -455,8 +455,9 @@
 
         function showScorePopup(score) {
             const popup = document.createElement('div');
-            popup.className = 'score-popup' + (score === 0 ? ' score-zero' : '');
-            popup.textContent = score > 0 ? '+' + score : '0';
+            const scoreValue = score != null ? score : 0;
+            popup.className = 'score-popup' + (scoreValue === 0 ? ' score-zero' : '');
+            popup.textContent = scoreValue > 0 ? '+' + scoreValue : '0';
             document.body.appendChild(popup);
 
             setTimeout(() => {
@@ -479,25 +480,35 @@
             const feedbackArea = document.getElementById('feedbackArea');
             const feedbackContent = document.getElementById('feedbackContent');
 
+            const scoreDisplay = scoreEarned != null ? scoreEarned : 0;
+            const correctDisplay = correctAnswer || '-';
+
             let html = '';
             if (isCorrect) {
                 html = `
                     <div class="alert alert-success mb-0">
                         <h5 class="alert-heading"><i class="bi bi-check-circle me-2"></i>Benar!</h5>
-                        <p class="mb-0">Anda mendapatkan <strong>+${scoreEarned} poin</strong></p>
+                        <p class="mb-0">Anda mendapatkan <strong>+${scoreDisplay} poin</strong></p>
                     </div>
                 `;
             } else {
                 html = `
                     <div class="alert alert-danger mb-0">
                         <h5 class="alert-heading"><i class="bi bi-x-circle me-2"></i>Salah!</h5>
-                        <p class="mb-0">Jawaban benar: <strong>${correctAnswer || '-'}</strong></p>
+                        <p class="mb-0">Jawaban benar: <strong>${correctDisplay}</strong></p>
                     </div>
                 `;
             }
 
             feedbackContent.innerHTML = html;
             feedbackArea.style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function loadNewQuestion(data) {
@@ -512,25 +523,30 @@
             // Update UI
             document.getElementById('currentQuestionNum').textContent = currentQuestionIndex + 1;
             document.getElementById('progressBar').style.width = ((currentQuestionIndex + 1) * 100 / totalQuestions) + '%';
-            document.getElementById('questionText').textContent = question.questionText;
+            document.getElementById('questionText').textContent = question.questionText || 'Loading...';
 
-            // Update options
+            // Update options with proper escaping
+            const optA = escapeHtml(question.optionA);
+            const optB = escapeHtml(question.optionB);
+            const optC = escapeHtml(question.optionC);
+            const optD = escapeHtml(question.optionD);
+
             const optionsHtml = `
                 <button type="button" class="btn btn-outline-secondary btn-lg w-100 text-start option-btn mb-3"
                         data-option="A" onclick="selectAnswer('A')">
-                    <span class="badge bg-secondary me-3">A</span>${question.optionA}
+                    <span class="badge bg-secondary me-3">A</span>${optA}
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-lg w-100 text-start option-btn mb-3"
                         data-option="B" onclick="selectAnswer('B')">
-                    <span class="badge bg-secondary me-3">B</span>${question.optionB}
+                    <span class="badge bg-secondary me-3">B</span>${optB}
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-lg w-100 text-start option-btn mb-3"
                         data-option="C" onclick="selectAnswer('C')">
-                    <span class="badge bg-secondary me-3">C</span>${question.optionC}
+                    <span class="badge bg-secondary me-3">C</span>${optC}
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-lg w-100 text-start option-btn"
                         data-option="D" onclick="selectAnswer('D')">
-                    <span class="badge bg-secondary me-3">D</span>${question.optionD}
+                    <span class="badge bg-secondary me-3">D</span>${optD}
                 </button>
             `;
             document.getElementById('optionsContainer').innerHTML = optionsHtml;

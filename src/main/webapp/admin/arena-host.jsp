@@ -253,7 +253,11 @@
                         <div id="leaderboardDisplay" class="list-group list-group-flush">
                             <% if (participants != null && !participants.isEmpty()) {
                                 int rank = 1;
-                                for (ArenaParticipant p : participants) { %>
+                                for (ArenaParticipant p : participants) {
+                                    String displayName = p.getUserName() != null ? p.getUserName() : "User #" + p.getUserId();
+                                    int displayScore = p.getScore() != null ? p.getScore() : 0;
+                                    boolean isConnected = p.getIsConnected() != null ? p.getIsConnected() : false;
+                            %>
                             <div class="list-group-item d-flex justify-content-between align-items-center" id="host-participant-<%= p.getId() %>">
                                 <div class="d-flex align-items-center">
                                     <span class="badge <%= rank == 1 ? "bg-warning text-dark" :
@@ -261,21 +265,22 @@
                                         <%= rank %>
                                     </span>
                                     <div>
-                                        <div class="fw-bold"><%= p.getUserName() %></div>
-                                        <small class="text-muted <%= p.getIsConnected() ? "text-success" : "text-danger" %>">
+                                        <div class="fw-bold"><%= displayName %></div>
+                                        <small class="text-muted <%= isConnected ? "text-success" : "text-danger" %>">
                                             <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>
-                                            <%= p.getIsConnected() ? "Online" : "Offline" %>
+                                            <%= isConnected ? "Online" : "Offline" %>
                                         </small>
                                     </div>
                                 </div>
-                                <span class="badge bg-arena fs-6"><%= p.getScore() %> pts</span>
+                                <span class="badge bg-arena fs-6"><%= displayScore %> pts</span>
                             </div>
                             <% rank++;
                                 }
                             } else { %>
                             <div class="text-center py-5 text-muted" id="noParticipantsHost">
                                 <i class="bi bi-people display-4 d-block mb-3"></i>
-                                <p>Belum ada peserta</p>
+                                <p>Belum ada peserta yang bergabung</p>
+                                <small class="text-muted">Share kode arena: <strong class="text-primary"><%= arenaSession.getCode() %></strong></small>
                             </div>
                             <% } %>
                         </div>
