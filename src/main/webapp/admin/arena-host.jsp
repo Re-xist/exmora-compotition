@@ -412,13 +412,53 @@
         }
 
         function updateQuestion(data) {
-            // This would update the question display in real-time
-            // For now, we'll reload on question changes
+            const question = data.data;
+            const questionIndex = data.questionIndex;
+            const questionDisplay = document.getElementById('questionDisplay');
+
+            if (!question || !questionDisplay) return;
+
+            const optA = question.optionA || '';
+            const optB = question.optionB || '';
+            const optC = question.optionC || '';
+            const optD = question.optionD || '';
+            const correctAnswer = question.correctAnswer || '-';
+
+            const html = `
+                <div class="mb-3">
+                    <span class="badge bg-arena mb-2">Soal ${questionIndex + 1}</span>
+                    <p class="fw-bold">${question.questionText || 'Loading...'}</p>
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex align-items-center">
+                        <span class="badge bg-secondary me-3">A</span>
+                        ${optA}
+                    </div>
+                    <div class="list-group-item d-flex align-items-center">
+                        <span class="badge bg-secondary me-3">B</span>
+                        ${optB}
+                    </div>
+                    <div class="list-group-item d-flex align-items-center">
+                        <span class="badge bg-secondary me-3">C</span>
+                        ${optC}
+                    </div>
+                    <div class="list-group-item d-flex align-items-center">
+                        <span class="badge bg-secondary me-3">D</span>
+                        ${optD}
+                    </div>
+                </div>
+                <div class="alert alert-success mt-3 mb-0">
+                    <strong>Jawaban Benar: ${correctAnswer}</strong>
+                </div>
+            `;
+
+            questionDisplay.innerHTML = html;
+            showNotification('Soal diperbarui', 'info');
         }
 
         function showNotification(message, type) {
-            // Simple alert for now, could be replaced with toast
             console.log(`[${type}] ${message}`);
+            // Could be enhanced with toast notification
         }
 
         // Control functions

@@ -184,31 +184,43 @@
                     </div>
                     <div class="card-body">
                         <div id="questionText" class="fs-5 mb-4">
-                            <%= currentQuestion != null ? currentQuestion.getQuestionText() : "Loading..." %>
+                            <%= currentQuestion != null && currentQuestion.getQuestionText() != null ? currentQuestion.getQuestionText() : "Memuat soal..." %>
                         </div>
 
                         <div id="optionsContainer">
-                            <% if (currentQuestion != null) { %>
+                            <% if (currentQuestion != null) {
+                                String optA = currentQuestion.getOptionA() != null ? currentQuestion.getOptionA() : "-";
+                                String optB = currentQuestion.getOptionB() != null ? currentQuestion.getOptionB() : "-";
+                                String optC = currentQuestion.getOptionC() != null ? currentQuestion.getOptionC() : "-";
+                                String optD = currentQuestion.getOptionD() != null ? currentQuestion.getOptionD() : "-";
+                            %>
                             <button type="button" class="btn btn-outline-secondary btn-lg w-100 text-start option-btn mb-3"
                                     data-option="A" onclick="selectAnswer('A')">
                                 <span class="badge bg-secondary me-3">A</span>
-                                <%= currentQuestion.getOptionA() %>
+                                <%= optA %>
                             </button>
                             <button type="button" class="btn btn-outline-secondary btn-lg w-100 text-start option-btn mb-3"
                                     data-option="B" onclick="selectAnswer('B')">
                                 <span class="badge bg-secondary me-3">B</span>
-                                <%= currentQuestion.getOptionB() %>
+                                <%= optB %>
                             </button>
                             <button type="button" class="btn btn-outline-secondary btn-lg w-100 text-start option-btn mb-3"
                                     data-option="C" onclick="selectAnswer('C')">
                                 <span class="badge bg-secondary me-3">C</span>
-                                <%= currentQuestion.getOptionC() %>
+                                <%= optC %>
                             </button>
                             <button type="button" class="btn btn-outline-secondary btn-lg w-100 text-start option-btn"
                                     data-option="D" onclick="selectAnswer('D')">
                                 <span class="badge bg-secondary me-3">D</span>
-                                <%= currentQuestion.getOptionD() %>
+                                <%= optD %>
                             </button>
+                            <% } else { %>
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-3 text-muted">Memuat soal...</p>
+                            </div>
                             <% } %>
                         </div>
 
