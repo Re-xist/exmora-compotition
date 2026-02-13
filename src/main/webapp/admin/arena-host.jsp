@@ -289,12 +289,13 @@
     <script>
         const sessionId = <%= arenaSession.getId() %>;
         const hostId = <%= currentUser.getId() %>;
+        const contextPath = '<%= request.getContextPath() %>';
         let websocket;
 
         // Initialize WebSocket connection
         function initWebSocket() {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${protocol}//${window.location.host}${getContextPath()}/arena/${sessionId}`;
+            const wsUrl = protocol + '//' + window.location.host + contextPath + '/arena/' + sessionId;
 
             websocket = new WebSocket(wsUrl);
 
@@ -323,10 +324,6 @@
             websocket.onerror = function(error) {
                 console.error('WebSocket error:', error);
             };
-        }
-
-        function getContextPath() {
-            return '<%= request.getContextPath() %>';
         }
 
         function handleWebSocketMessage(data) {
