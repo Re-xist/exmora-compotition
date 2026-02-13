@@ -16,7 +16,7 @@ public class QuizDAO {
      * Create a new quiz
      */
     public Quiz create(Quiz quiz) throws SQLException {
-        String sql = "INSERT INTO quiz (title, description, duration, is_active, created_by, deadline) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO quiz (title, description, duration, is_active, created_by, deadline, target_tag) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -27,6 +27,7 @@ public class QuizDAO {
             stmt.setBoolean(4, quiz.getIsActive() != null ? quiz.getIsActive() : false);
             stmt.setInt(5, quiz.getCreatedBy());
             stmt.setTimestamp(6, quiz.getDeadline() != null ? Timestamp.valueOf(quiz.getDeadline()) : null);
+            stmt.setString(7, quiz.getTargetTag());
 
             int affectedRows = stmt.executeUpdate();
 
@@ -140,7 +141,7 @@ public class QuizDAO {
      * Update quiz
      */
     public boolean update(Quiz quiz) throws SQLException {
-        String sql = "UPDATE quiz SET title = ?, description = ?, duration = ?, is_active = ?, deadline = ? WHERE id = ?";
+        String sql = "UPDATE quiz SET title = ?, description = ?, duration = ?, is_active = ?, deadline = ?, target_tag = ? WHERE id = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -150,7 +151,8 @@ public class QuizDAO {
             stmt.setInt(3, quiz.getDuration());
             stmt.setBoolean(4, quiz.getIsActive());
             stmt.setTimestamp(5, quiz.getDeadline() != null ? Timestamp.valueOf(quiz.getDeadline()) : null);
-            stmt.setInt(6, quiz.getId());
+            stmt.setString(6, quiz.getTargetTag());
+            stmt.setInt(7, quiz.getId());
 
             return stmt.executeUpdate() > 0;
         }
@@ -221,6 +223,55 @@ public class QuizDAO {
     }
 
     /**
+     * Get active quizzes for a specific tag (or all if tag is null/empty)
+     * Supports comma-separated target tags using FIND_IN_SET
+     */
+    public List<Quiz> findActiveByTag(String userTag) throws SQLException {
+        String sql;
+        List<Quiz> quizzes = new ArrayList<>();
+
+        if (userTag == null || userTag.isEmpty()) {
+            // User has no tag, only show quizzes for all (target_tag is null or 'ALL')
+            sql = "SELECT q.*, u.name as created_by_name, " +
+                  "(SELECT COUNT(*) FROM questions WHERE quiz_id = q.id) as question_count " +
+                  "FROM quiz q LEFT JOIN users u ON q.created_by = u.id " +
+                  "WHERE q.is_active = true AND (q.deadline IS NULL OR q.deadline > NOW()) " +
+                  "AND (q.target_tag IS NULL OR q.target_tag = '' OR q.target_tag = 'ALL') " +
+                  "ORDER BY q.deadline ASC, q.created_at DESC";
+
+            try (Connection conn = DBUtil.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+
+                while (rs.next()) {
+                    quizzes.add(mapResultSetToQuiz(rs));
+                }
+            }
+        } else {
+            // User has a tag, show quizzes for all OR matching their tag (using FIND_IN_SET for comma-separated tags)
+            sql = "SELECT q.*, u.name as created_by_name, " +
+                  "(SELECT COUNT(*) FROM questions WHERE quiz_id = q.id) as question_count " +
+                  "FROM quiz q LEFT JOIN users u ON q.created_by = u.id " +
+                  "WHERE q.is_active = true AND (q.deadline IS NULL OR q.deadline > NOW()) " +
+                  "AND (q.target_tag IS NULL OR q.target_tag = '' OR q.target_tag = 'ALL' OR FIND_IN_SET(?, q.target_tag) > 0) " +
+                  "ORDER BY q.deadline ASC, q.created_at DESC";
+
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                stmt.setString(1, userTag);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        quizzes.add(mapResultSetToQuiz(rs));
+                    }
+                }
+            }
+        }
+        return quizzes;
+    }
+
+    /**
      * Map ResultSet to Quiz object
      */
     private Quiz mapResultSetToQuiz(ResultSet rs) throws SQLException {
@@ -238,6 +289,7 @@ public class QuizDAO {
             quiz.setDeadline(deadline.toLocalDateTime());
         }
 
+        quiz.setTargetTag(rs.getString("target_tag"));
         quiz.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         quiz.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
         quiz.setQuestionCount(rs.getInt("question_count"));

@@ -360,6 +360,152 @@ public class SubmissionDAO {
     }
 
     /**
+     * Get detailed submissions with answers for a quiz
+     * Returns list of maps containing submission info and user details
+     */
+    public List<Map<String, Object>> getDetailedSubmissionsByQuiz(Integer quizId) throws SQLException {
+        String sql = "SELECT s.*, u.name as user_name, u.email as user_email, u.tag as user_tag, q.title as quiz_title " +
+                     "FROM submissions s " +
+                     "LEFT JOIN users u ON s.user_id = u.id " +
+                     "LEFT JOIN quiz q ON s.quiz_id = q.id " +
+                     "WHERE s.quiz_id = ? AND s.status = 'completed' " +
+                     "ORDER BY s.score DESC, s.time_spent ASC";
+        List<Map<String, Object>> detailedSubmissions = new ArrayList<>();
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, quizId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                int rank = 1;
+                while (rs.next()) {
+                    Map<String, Object> detail = new HashMap<>();
+                    detail.put("id", rs.getInt("id"));
+                    detail.put("quizId", rs.getInt("quiz_id"));
+                    detail.put("userId", rs.getInt("user_id"));
+                    detail.put("score", rs.getDouble("score"));
+                    detail.put("totalQuestions", rs.getInt("total_questions"));
+                    detail.put("correctAnswers", rs.getInt("correct_answers"));
+                    detail.put("timeSpent", rs.getInt("time_spent"));
+                    detail.put("status", rs.getString("status"));
+                    detail.put("userName", rs.getString("user_name"));
+                    detail.put("userEmail", rs.getString("user_email"));
+                    detail.put("userTag", rs.getString("user_tag"));
+                    detail.put("quizTitle", rs.getString("quiz_title"));
+                    detail.put("rank", rank++);
+
+                    Timestamp submittedAt = rs.getTimestamp("submitted_at");
+                    if (submittedAt != null) {
+                        detail.put("submittedAt", submittedAt.toLocalDateTime());
+                    }
+
+                    // Calculate unanswered questions
+                    int unanswered = rs.getInt("total_questions") - rs.getInt("correct_answers");
+                    // Note: We need to get actual answered count from answers table for accurate unanswered count
+                    detail.put("unanswered", unanswered);
+
+                    detailedSubmissions.add(detail);
+                }
+            }
+        }
+        return detailedSubmissions;
+    }
+
+    /**
+     * Get submission with all questions and answers for detailed view
+     */
+    public Map<String, Object> getSubmissionDetailWithAnswers(Integer submissionId) throws SQLException {
+        Map<String, Object> result = new HashMap<>();
+
+        // Get submission info
+        Submission submission = findById(submissionId);
+        if (submission == null) {
+            return null;
+        }
+
+        result.put("submission", submission);
+
+        // Get all questions for this quiz with user's answers
+        String sql = "SELECT q.id, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d, " +
+                     "q.correct_answer, q.question_order, a.selected_answer, a.is_correct " +
+                     "FROM questions q " +
+                     "LEFT JOIN answers a ON q.id = a.question_id AND a.submission_id = ? " +
+                     "WHERE q.quiz_id = ? " +
+                     "ORDER BY q.question_order, q.id";
+
+        List<Map<String, Object>> questionsWithAnswers = new ArrayList<>();
+        int correctCount = 0;
+        int wrongCount = 0;
+        int unansweredCount = 0;
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, submissionId);
+            stmt.setInt(2, submission.getQuizId());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> qa = new HashMap<>();
+                    qa.put("questionId", rs.getInt("id"));
+                    qa.put("questionText", rs.getString("question_text"));
+                    qa.put("optionA", rs.getString("option_a"));
+                    qa.put("optionB", rs.getString("option_b"));
+                    qa.put("optionC", rs.getString("option_c"));
+                    qa.put("optionD", rs.getString("option_d"));
+                    qa.put("correctAnswer", rs.getString("correct_answer"));
+                    qa.put("questionOrder", rs.getInt("question_order"));
+
+                    String selectedAnswer = rs.getString("selected_answer");
+                    Boolean isCorrect = rs.getBoolean("is_correct");
+
+                    qa.put("selectedAnswer", selectedAnswer);
+                    qa.put("isCorrect", isCorrect);
+                    qa.put("answered", selectedAnswer != null);
+
+                    if (selectedAnswer == null) {
+                        unansweredCount++;
+                    } else if (isCorrect != null && isCorrect) {
+                        correctCount++;
+                    } else {
+                        wrongCount++;
+                    }
+
+                    questionsWithAnswers.add(qa);
+                }
+            }
+        }
+
+        result.put("questions", questionsWithAnswers);
+        result.put("correctCount", correctCount);
+        result.put("wrongCount", wrongCount);
+        result.put("unansweredCount", unansweredCount);
+
+        return result;
+    }
+
+    /**
+     * Get unanswered count for a submission (actual count from answers table)
+     */
+    public int getAnsweredCount(Integer submissionId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM answers WHERE submission_id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, submissionId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
      * Map ResultSet to Submission object
      */
     private Submission mapResultSetToSubmission(ResultSet rs) throws SQLException {

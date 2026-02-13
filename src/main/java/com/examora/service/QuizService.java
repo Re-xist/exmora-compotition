@@ -30,13 +30,22 @@ public class QuizService {
      */
     public Quiz createQuiz(String title, String description, Integer duration, Integer createdBy)
             throws ServiceException {
-        return createQuiz(title, description, duration, createdBy, null);
+        return createQuiz(title, description, duration, createdBy, null, null);
     }
 
     /**
      * Create a new quiz with deadline
      */
     public Quiz createQuiz(String title, String description, Integer duration, Integer createdBy, LocalDateTime deadline)
+            throws ServiceException {
+        return createQuiz(title, description, duration, createdBy, deadline, null);
+    }
+
+    /**
+     * Create a new quiz with deadline and target tag
+     */
+    public Quiz createQuiz(String title, String description, Integer duration, Integer createdBy,
+                          LocalDateTime deadline, String targetTag)
             throws ServiceException {
         // Validate inputs
         if (ValidationUtil.isEmpty(title)) {
@@ -52,6 +61,7 @@ public class QuizService {
         try {
             Quiz quiz = new Quiz(title, description, duration, createdBy);
             quiz.setDeadline(deadline);
+            quiz.setTargetTag(targetTag);
             return quizDAO.create(quiz);
         } catch (SQLException e) {
             throw new ServiceException("Gagal membuat quiz: " + e.getMessage(), e);
@@ -96,6 +106,17 @@ public class QuizService {
     }
 
     /**
+     * Get active quizzes for a specific tag
+     */
+    public List<Quiz> getActiveQuizzesByTag(String userTag) throws ServiceException {
+        try {
+            return quizDAO.findActiveByTag(userTag);
+        } catch (SQLException e) {
+            throw new ServiceException("Gagal mengambil data quizzes: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Get quizzes by creator
      */
     public List<Quiz> getQuizzesByCreator(Integer createdBy) throws ServiceException {
@@ -111,13 +132,22 @@ public class QuizService {
      */
     public Quiz updateQuiz(Integer id, String title, String description, Integer duration)
             throws ServiceException {
-        return updateQuiz(id, title, description, duration, null);
+        return updateQuiz(id, title, description, duration, null, null);
     }
 
     /**
      * Update quiz with deadline
      */
     public Quiz updateQuiz(Integer id, String title, String description, Integer duration, LocalDateTime deadline)
+            throws ServiceException {
+        return updateQuiz(id, title, description, duration, deadline, null);
+    }
+
+    /**
+     * Update quiz with deadline and target tag
+     */
+    public Quiz updateQuiz(Integer id, String title, String description, Integer duration,
+                          LocalDateTime deadline, String targetTag)
             throws ServiceException {
         if (ValidationUtil.isEmpty(title)) {
             throw new ServiceException("Judul quiz tidak boleh kosong");
@@ -136,6 +166,7 @@ public class QuizService {
             quiz.setDescription(description);
             quiz.setDuration(duration);
             quiz.setDeadline(deadline);
+            quiz.setTargetTag(targetTag);
 
             if (!quizDAO.update(quiz)) {
                 throw new ServiceException("Gagal mengupdate quiz");

@@ -6,11 +6,18 @@ import com.examora.service.SubmissionService;
 import com.examora.service.UserService;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +25,7 @@ import java.util.Map;
  * Admin Servlet - Handles admin dashboard and statistics
  */
 @WebServlet("/AdminServlet")
+@MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 5 * 1024 * 1024, maxRequestSize = 10 * 1024 * 1024)
 public class AdminServlet extends HttpServlet {
     private UserService userService;
     private QuizService quizService;
@@ -42,6 +50,10 @@ public class AdminServlet extends HttpServlet {
                 listUsers(request, response);
             } else if ("statistics".equals(action)) {
                 showStatistics(request, response);
+            } else if ("userDetail".equals(action)) {
+                showUserDetail(request, response);
+            } else if ("downloadTemplate".equals(action)) {
+                downloadCsvTemplate(request, response);
             } else {
                 showDashboard(request, response);
             }
@@ -65,6 +77,10 @@ public class AdminServlet extends HttpServlet {
                 editUser(request, response);
             } else if ("resetPassword".equals(action)) {
                 resetPassword(request, response);
+            } else if ("createTag".equals(action)) {
+                createTag(request, response);
+            } else if ("importUsers".equals(action)) {
+                importUsersFromCsv(request, response);
             } else {
                 response.sendRedirect("../AdminServlet?action=dashboard");
             }
@@ -114,6 +130,7 @@ public class AdminServlet extends HttpServlet {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
             String role = request.getParameter("role");
+            String tag = request.getParameter("tag");
 
             if (name == null || name.trim().isEmpty()) {
                 request.setAttribute("error", "Nama tidak boleh kosong");
@@ -131,7 +148,7 @@ public class AdminServlet extends HttpServlet {
                 return;
             }
 
-            userService.register(name.trim(), email.trim(), password, role != null ? role : "peserta");
+            userService.register(name.trim(), email.trim(), password, role != null ? role : "peserta", tag);
             request.setAttribute("success", "User berhasil dibuat");
             listUsers(request, response);
 
@@ -148,6 +165,7 @@ public class AdminServlet extends HttpServlet {
             String name = request.getParameter("name");
             String email = request.getParameter("email");
             String role = request.getParameter("role");
+            String tag = request.getParameter("tag");
 
             if (userIdStr == null || userIdStr.isEmpty()) {
                 request.setAttribute("error", "User ID tidak valid");
@@ -157,13 +175,8 @@ public class AdminServlet extends HttpServlet {
 
             Integer userId = Integer.parseInt(userIdStr);
 
-            // Update user profile
-            userService.updateProfile(userId, name, email);
-
-            // Update role if provided
-            if (role != null && !role.isEmpty()) {
-                userService.updateUserRole(userId, role);
-            }
+            // Update user profile with tag
+            userService.updateUserProfile(userId, name, email, role, tag);
 
             request.setAttribute("success", "User berhasil diupdate");
             listUsers(request, response);
@@ -236,18 +249,26 @@ public class AdminServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             String roleFilter = request.getParameter("role");
+            String tagFilter = request.getParameter("tag");
             List<User> users;
 
             if ("admin".equals(roleFilter)) {
                 users = userService.getUsersByRole("admin");
             } else if ("peserta".equals(roleFilter)) {
                 users = userService.getUsersByRole("peserta");
+            } else if (tagFilter != null && !tagFilter.isEmpty()) {
+                users = userService.getUsersByTag(tagFilter);
             } else {
                 users = userService.getAllUsers();
             }
 
+            // Get all tags for filter dropdown
+            List<String> tags = userService.getAllTags();
+
             request.setAttribute("users", users);
             request.setAttribute("roleFilter", roleFilter);
+            request.setAttribute("tagFilter", tagFilter);
+            request.setAttribute("tags", tags);
             request.getRequestDispatcher("/admin/users.jsp").forward(request, response);
 
         } catch (Exception e) {
@@ -266,6 +287,10 @@ public class AdminServlet extends HttpServlet {
                 Map<String, Object> stats = submissionService.getQuizStatistics(quizId);
                 request.setAttribute("statistics", stats);
                 request.setAttribute("selectedQuizId", quizId);
+
+                // Get detailed submissions list
+                List<Map<String, Object>> submissions = submissionService.getDetailedQuizResults(quizId);
+                request.setAttribute("submissions", submissions);
             }
 
             request.setAttribute("quizzes", quizService.getAllQuizzes());
@@ -274,5 +299,243 @@ public class AdminServlet extends HttpServlet {
         } catch (Exception e) {
             throw new ServletException("Error loading statistics", e);
         }
+    }
+
+    private void showUserDetail(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String submissionIdStr = request.getParameter("submissionId");
+            if (submissionIdStr == null || submissionIdStr.isEmpty()) {
+                request.setAttribute("error", "Submission ID tidak valid");
+                request.getRequestDispatcher("/admin/user-detail.jsp").forward(request, response);
+                return;
+            }
+
+            Integer submissionId = Integer.parseInt(submissionIdStr);
+            Map<String, Object> detail = submissionService.getSubmissionDetail(submissionId);
+
+            if (detail == null) {
+                request.setAttribute("error", "Submission tidak ditemukan");
+                request.getRequestDispatcher("/admin/user-detail.jsp").forward(request, response);
+                return;
+            }
+
+            request.setAttribute("detail", detail);
+            request.getRequestDispatcher("/admin/user-detail.jsp").forward(request, response);
+
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Submission ID tidak valid");
+            request.getRequestDispatcher("/admin/user-detail.jsp").forward(request, response);
+        } catch (Exception e) {
+            request.setAttribute("error", "Error loading user detail: " + e.getMessage());
+            request.getRequestDispatcher("/admin/user-detail.jsp").forward(request, response);
+        }
+    }
+
+    private void createTag(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            String tagName = request.getParameter("tagName");
+            if (tagName == null || tagName.trim().isEmpty()) {
+                response.getWriter().write("{\"success\": false, \"error\": \"Nama tag tidak boleh kosong\"}");
+                return;
+            }
+
+            tagName = tagName.trim();
+
+            // Check if tag already exists
+            List<String> existingTags = userService.getAllTags();
+            if (existingTags != null && existingTags.contains(tagName)) {
+                response.getWriter().write("{\"success\": false, \"error\": \"Tag sudah ada\"}");
+                return;
+            }
+
+            // Tag will be created when a user is assigned to it
+            // For now, we just return success as tags are created on-demand
+            response.getWriter().write("{\"success\": true, \"tagName\": \"" + tagName + "\"}");
+
+        } catch (Exception e) {
+            response.getWriter().write("{\"success\": false, \"error\": \"" + e.getMessage() + "\"}");
+        }
+    }
+
+    /**
+     * Download CSV template for user import
+     */
+    private void downloadCsvTemplate(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"template_import_user.csv\"");
+        response.setCharacterEncoding("UTF-8");
+
+        // Add BOM for Excel compatibility
+        response.getOutputStream().write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+
+        PrintWriter writer = response.getWriter();
+
+        // CSV Header
+        writer.println("nama,email,password,role,tag");
+
+        // Sample data rows (3 dummy users)
+        writer.println("Ahmad Rizki,ahmad.rizki@email.com,Password123,peserta,TI-2024");
+        writer.println("Siti Nurhaliza,siti.nur@email.com,Password123,peserta,SI-2024");
+        writer.println("Budi Pratama,budi.pratama@email.com,Password123,peserta,TI-2024");
+
+        writer.flush();
+    }
+
+    /**
+     * Import users from CSV file
+     */
+    private void importUsersFromCsv(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            Part filePart = request.getPart("csvFile");
+            if (filePart == null || filePart.getSize() == 0) {
+                request.setAttribute("error", "File CSV tidak ditemukan atau kosong");
+                listUsers(request, response);
+                return;
+            }
+
+            boolean skipHeader = "on".equals(request.getParameter("skipHeader"));
+            boolean updateExisting = "on".equals(request.getParameter("updateExisting"));
+
+            List<String[]> users = new ArrayList<>();
+            List<String> errors = new ArrayList<>();
+            int successCount = 0;
+            int updateCount = 0;
+            int errorCount = 0;
+
+            // Read CSV file
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(filePart.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                int lineNumber = 0;
+
+                while ((line = reader.readLine()) != null) {
+                    lineNumber++;
+
+                    // Skip header if requested
+                    if (skipHeader && lineNumber == 1) {
+                        continue;
+                    }
+
+                    // Skip empty lines
+                    if (line.trim().isEmpty()) {
+                        continue;
+                    }
+
+                    // Parse CSV line (handle quoted values)
+                    String[] fields = parseCsvLine(line);
+
+                    if (fields.length < 3) {
+                        errors.add("Baris " + lineNumber + ": Data tidak lengkap (minimal: nama, email, password)");
+                        errorCount++;
+                        continue;
+                    }
+
+                    String name = fields[0].trim();
+                    String email = fields[1].trim();
+                    String password = fields[2].trim();
+                    String role = fields.length > 3 ? fields[3].trim() : "peserta";
+                    String tag = fields.length > 4 ? fields[4].trim() : null;
+
+                    // Validate data
+                    if (name.isEmpty()) {
+                        errors.add("Baris " + lineNumber + ": Nama tidak boleh kosong");
+                        errorCount++;
+                        continue;
+                    }
+                    if (email.isEmpty()) {
+                        errors.add("Baris " + lineNumber + ": Email tidak boleh kosong");
+                        errorCount++;
+                        continue;
+                    }
+                    if (password.isEmpty() || password.length() < 6) {
+                        errors.add("Baris " + lineNumber + ": Password minimal 6 karakter");
+                        errorCount++;
+                        continue;
+                    }
+                    if (!role.equals("admin") && !role.equals("peserta")) {
+                        role = "peserta"; // Default to peserta
+                    }
+
+                    try {
+                        // Check if email already exists
+                        User existingUser = userService.findByEmail(email);
+
+                        if (existingUser != null) {
+                            if (updateExisting) {
+                                // Update existing user
+                                userService.updateUserProfile(existingUser.getId(), name, email, role, tag);
+                                userService.resetPasswordByAdmin(existingUser.getId(), password);
+                                updateCount++;
+                            } else {
+                                errors.add("Baris " + lineNumber + ": Email '" + email + "' sudah terdaftar");
+                                errorCount++;
+                            }
+                        } else {
+                            // Create new user
+                            userService.register(name, email, password, role, tag);
+                            successCount++;
+                        }
+                    } catch (Exception e) {
+                        errors.add("Baris " + lineNumber + ": " + e.getMessage());
+                        errorCount++;
+                    }
+                }
+            }
+
+            // Build result message
+            StringBuilder resultMsg = new StringBuilder();
+            resultMsg.append("Import selesai!<br>");
+            resultMsg.append("- Berhasil ditambah: ").append(successCount).append(" user<br>");
+            resultMsg.append("- Berhasil diupdate: ").append(updateCount).append(" user<br>");
+            resultMsg.append("- Gagal: ").append(errorCount).append(" user");
+
+            if (!errors.isEmpty()) {
+                request.setAttribute("importErrors", errors);
+            }
+
+            if (errorCount > 0 && successCount == 0 && updateCount == 0) {
+                request.setAttribute("error", resultMsg.toString());
+            } else {
+                request.setAttribute("success", resultMsg.toString());
+            }
+
+            listUsers(request, response);
+
+        } catch (Exception e) {
+            request.setAttribute("error", "Gagal import: " + e.getMessage());
+            listUsers(request, response);
+        }
+    }
+
+    /**
+     * Parse CSV line handling quoted values
+     */
+    private String[] parseCsvLine(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder field = new StringBuilder();
+        boolean inQuotes = false;
+
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (c == ',' && !inQuotes) {
+                fields.add(field.toString());
+                field = new StringBuilder();
+            } else {
+                field.append(c);
+            }
+        }
+        fields.add(field.toString());
+
+        return fields.toArray(new String[0]);
     }
 }

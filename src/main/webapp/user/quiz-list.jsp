@@ -133,11 +133,10 @@
                             <i class="bi bi-eye me-1"></i>Lihat Hasil
                         </a>
                         <% } else { %>
-                        <a href="../ExamServlet?action=start&quizId=<%= quiz.getId() %>"
-                           class="btn btn-primary w-100"
-                           onclick="return confirm('Mulai mengerjakan quiz ini? Pastikan Anda memiliki waktu yang cukup.')">
+                        <button type="button" class="btn btn-primary w-100"
+                                onclick="showStartQuizModal(<%= quiz.getId() %>, '<%= quiz.getTitle().replace("'", "\\'") %>', <%= quiz.getDuration() %>, <%= quiz.getQuestionCount() %>)">
                             <i class="bi bi-play-fill me-1"></i>Mulai Quiz
-                        </a>
+                        </button>
                         <% } %>
                     </div>
                 </div>
@@ -164,6 +163,75 @@
         </div>
     </footer>
 
+    <!-- Start Quiz Confirmation Modal -->
+    <div class="modal fade" id="startQuizModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-primary text-white border-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-play-circle me-2"></i>Konfirmasi Mulai Quiz
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                             style="width: 80px; height: 80px;">
+                            <i class="bi bi-journal-check text-primary" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h5 class="mb-3" id="modalQuizTitle">Nama Quiz</h5>
+                    <div class="row justify-content-center mb-4">
+                        <div class="col-auto">
+                            <div class="text-center px-3">
+                                <i class="bi bi-clock text-primary fs-4"></i>
+                                <div class="fw-bold" id="modalQuizDuration">30</div>
+                                <small class="text-muted">menit</small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="text-center px-3 border-start">
+                                <i class="bi bi-question-circle text-primary fs-4"></i>
+                                <div class="fw-bold" id="modalQuizQuestions">10</div>
+                                <small class="text-muted">soal</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning text-start mb-0">
+                        <h6 class="alert-heading mb-2">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Perhatian!
+                        </h6>
+                        <ul class="mb-0 small">
+                            <li>Pastikan Anda memiliki waktu yang cukup</li>
+                            <li>Quiz tidak dapat dijeda setelah dimulai</li>
+                            <li>Pastikan koneksi internet stabil</li>
+                            <li>Jangan refresh atau tutup halaman saat mengerjakan</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i>Batal
+                    </button>
+                    <a href="#" id="startQuizBtn" class="btn btn-primary px-4">
+                        <i class="bi bi-play-fill me-1"></i>Mulai Sekarang
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showStartQuizModal(quizId, title, duration, questions) {
+            document.getElementById('modalQuizTitle').textContent = title;
+            document.getElementById('modalQuizDuration').textContent = duration;
+            document.getElementById('modalQuizQuestions').textContent = questions;
+            document.getElementById('startQuizBtn').href = '../ExamServlet?action=start&quizId=' + quizId;
+
+            var modal = new bootstrap.Modal(document.getElementById('startQuizModal'));
+            modal.show();
+        }
+    </script>
 </body>
 </html>

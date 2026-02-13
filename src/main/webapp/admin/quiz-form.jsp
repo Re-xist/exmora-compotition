@@ -1,8 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.examora.model.User" %>
 <%@ page import="com.examora.model.Quiz" %>
+<%@ page import="com.examora.service.UserService" %>
 <%@ page import="java.time.LocalDateTime" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.HashSet" %>
 <%
     User currentUser = (User) session.getAttribute("user");
     if (currentUser == null || !currentUser.isAdmin()) {
@@ -13,10 +17,28 @@
     boolean isEdit = quiz != null && quiz.getId() != null;
     String error = (String) request.getAttribute("error");
 
+    // Get all tags
+    UserService userService = new UserService();
+    List<String> tags = null;
+    try {
+        tags = userService.getAllTags();
+    } catch (Exception e) {
+        // Ignore
+    }
+
     // Format deadline for datetime-local input
     String deadlineValue = "";
     if (isEdit && quiz.getDeadline() != null) {
         deadlineValue = quiz.getDeadline().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+    }
+
+    // Get current target tags as a Set for multi-select
+    HashSet<String> currentTargetTags = new HashSet<>();
+    if (isEdit && quiz.getTargetTag() != null && !quiz.getTargetTag().isEmpty() && !"ALL".equals(quiz.getTargetTag())) {
+        String[] tagArray = quiz.getTargetTag().split(",");
+        for (String tag : tagArray) {
+            currentTargetTags.add(tag.trim());
+        }
     }
 %>
 <!DOCTYPE html>
@@ -112,6 +134,34 @@
                                 </div>
                             </div>
 
+                            <div class="mb-3">
+                                <label class="form-label">Target Peserta <span class="text-muted">(opsional)</span></label>
+                                <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="tagAll" name="targetTags" value="ALL"
+                                               <%= currentTargetTags.isEmpty() ? "checked" : "" %>>
+                                        <label class="form-check-label" for="tagAll">
+                                            <strong>-- Semua Peserta --</strong>
+                                        </label>
+                                    </div>
+                                    <hr class="my-2">
+                                    <% if (tags != null && !tags.isEmpty()) {
+                                        for (String tag : tags) { %>
+                                    <div class="form-check">
+                                        <input class="form-check-input target-tag-checkbox" type="checkbox" id="tag<%= tag.replace("-", "") %>" name="targetTags" value="<%= tag %>"
+                                               <%= currentTargetTags.contains(tag) ? "checked" : "" %>>
+                                        <label class="form-check-label" for="tag<%= tag.replace("-", "") %>">
+                                            <%= tag %>
+                                        </label>
+                                    </div>
+                                    <% }
+                                    } else { %>
+                                    <div class="text-muted small">Belum ada tag tersedia</div>
+                                    <% } %>
+                                </div>
+                                <div class="form-text">Pilih satu atau beberapa tag untuk membatasi quiz hanya untuk peserta tertentu. Pilih "Semua Peserta" untuk semua user</div>
+                            </div>
+
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-check-lg me-2"></i><%= isEdit ? "Update" : "Simpan" %>
@@ -162,5 +212,37 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle checkbox behavior for target tags
+        document.addEventListener('DOMContentLoaded', function() {
+            const tagAllCheckbox = document.getElementById('tagAll');
+            const tagCheckboxes = document.querySelectorAll('.target-tag-checkbox');
+
+            // When "Semua Peserta" is checked, uncheck all other tags
+            tagAllCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    tagCheckboxes.forEach(function(cb) {
+                        cb.checked = false;
+                    });
+                }
+            });
+
+            // When any specific tag is checked, uncheck "Semua Peserta"
+            tagCheckboxes.forEach(function(cb) {
+                cb.addEventListener('change', function() {
+                    if (this.checked) {
+                        tagAllCheckbox.checked = false;
+                    }
+                    // If no specific tag is selected, check "Semua Peserta"
+                    const anyChecked = Array.from(tagCheckboxes).some(function(c) {
+                        return c.checked;
+                    });
+                    if (!anyChecked) {
+                        tagAllCheckbox.checked = true;
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -138,15 +138,19 @@ public class QuizServlet extends HttpServlet {
         String description = request.getParameter("description");
         String durationStr = request.getParameter("duration");
         String deadlineStr = request.getParameter("deadline");
+        String[] targetTags = request.getParameterValues("targetTags");
 
         Integer duration = durationStr != null && !durationStr.isEmpty() ?
                 Integer.parseInt(durationStr) : 30;
 
         LocalDateTime deadline = parseDeadline(deadlineStr);
 
+        // Handle target tags - join multiple tags with comma
+        String targetTag = processTargetTags(targetTags);
+
         User user = (User) request.getSession().getAttribute("user");
 
-        Quiz quiz = quizService.createQuiz(title, description, duration, user.getId(), deadline);
+        Quiz quiz = quizService.createQuiz(title, description, duration, user.getId(), deadline, targetTag);
 
         request.setAttribute("success", "Quiz berhasil dibuat");
         response.sendRedirect(request.getContextPath() + "/QuestionServlet?action=list&quizId=" + quiz.getId());
@@ -159,6 +163,7 @@ public class QuizServlet extends HttpServlet {
         String description = request.getParameter("description");
         String durationStr = request.getParameter("duration");
         String deadlineStr = request.getParameter("deadline");
+        String[] targetTags = request.getParameterValues("targetTags");
 
         Integer id = Integer.parseInt(idStr);
         Integer duration = durationStr != null && !durationStr.isEmpty() ?
@@ -166,7 +171,10 @@ public class QuizServlet extends HttpServlet {
 
         LocalDateTime deadline = parseDeadline(deadlineStr);
 
-        quizService.updateQuiz(id, title, description, duration, deadline);
+        // Handle target tags - join multiple tags with comma
+        String targetTag = processTargetTags(targetTags);
+
+        quizService.updateQuiz(id, title, description, duration, deadline, targetTag);
 
         request.setAttribute("success", "Quiz berhasil diupdate");
         response.sendRedirect(request.getContextPath() + "/QuizServlet?action=list");
@@ -189,6 +197,36 @@ public class QuizServlet extends HttpServlet {
                 return null;
             }
         }
+    }
+
+    /**
+     * Process target tags from form - join multiple tags with comma
+     * Returns null if "ALL" or no tags selected (means all users)
+     */
+    private String processTargetTags(String[] targetTags) {
+        if (targetTags == null || targetTags.length == 0) {
+            return null;
+        }
+
+        // Check if "ALL" is selected
+        for (String tag : targetTags) {
+            if ("ALL".equals(tag)) {
+                return null;
+            }
+        }
+
+        // Filter out empty strings and join with comma
+        StringBuilder sb = new StringBuilder();
+        for (String tag : targetTags) {
+            if (tag != null && !tag.trim().isEmpty()) {
+                if (sb.length() > 0) {
+                    sb.append(",");
+                }
+                sb.append(tag.trim());
+            }
+        }
+
+        return sb.length() > 0 ? sb.toString() : null;
     }
 
     private void deleteQuiz(HttpServletRequest request, HttpServletResponse response)

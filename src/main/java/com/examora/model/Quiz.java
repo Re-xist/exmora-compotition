@@ -17,6 +17,7 @@ public class Quiz {
     private Integer createdBy;
     private String createdByName; // for display purposes
     private LocalDateTime deadline; // deadline for taking the quiz
+    private String targetTag; // target tag for quiz visibility (null = all users)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Integer questionCount; // for display purposes
@@ -97,6 +98,14 @@ public class Quiz {
         this.deadline = deadline;
     }
 
+    public String getTargetTag() {
+        return targetTag;
+    }
+
+    public void setTargetTag(String targetTag) {
+        this.targetTag = targetTag;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -173,6 +182,31 @@ public class Quiz {
         return wibTime.format(formatter) + " WIB";
     }
 
+    // Check if quiz is visible to a specific tag
+    public boolean isVisibleToTag(String userTag) {
+        // If no target tag, visible to all
+        if (targetTag == null || targetTag.isEmpty() || "ALL".equals(targetTag)) {
+            return true;
+        }
+        // If user has no tag, only see quizzes for all
+        if (userTag == null || userTag.isEmpty()) {
+            return targetTag == null || targetTag.isEmpty() || "ALL".equals(targetTag);
+        }
+        // Check if user's tag is in the comma-separated list of target tags
+        String[] tags = targetTag.split(",");
+        for (String tag : tags) {
+            if (tag.trim().equals(userTag)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Check if quiz is for all tags
+    public boolean isForAllTags() {
+        return targetTag == null || targetTag.isEmpty() || "ALL".equals(targetTag);
+    }
+
     @Override
     public String toString() {
         return "Quiz{" +
@@ -181,6 +215,7 @@ public class Quiz {
                 ", duration=" + duration +
                 ", isActive=" + isActive +
                 ", deadline=" + deadline +
+                ", targetTag='" + targetTag + '\'' +
                 '}';
     }
 }

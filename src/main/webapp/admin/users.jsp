@@ -54,7 +54,16 @@
                     </ol>
                 </nav>
             </div>
-            <div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="../AdminServlet?action=downloadTemplate" class="btn btn-outline-success">
+                    <i class="bi bi-file-earmark-spreadsheet me-2"></i>Template CSV
+                </a>
+                <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#createTagModal">
+                    <i class="bi bi-tag me-2"></i>Kelola Tag
+                </button>
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importCsvModal">
+                    <i class="bi bi-upload me-2"></i>Import CSV
+                </button>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
                     <i class="bi bi-person-plus me-2"></i>Tambah User
                 </button>
@@ -351,16 +360,24 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Tag</label>
-                            <input type="text" class="form-control" name="tag" id="createTag"
-                                   list="tagList" placeholder="Contoh: Kelas A, Divisi IT, dll">
-                            <datalist id="tagList">
-                                <% if (tags != null) {
-                                    for (String tag : tags) { %>
-                                <option value="<%= tag %>">
-                                <% }
-                                } %>
-                            </datalist>
-                            <small class="text-muted">Tag untuk mengelompokkan user (opsional)</small>
+                            <div class="input-group">
+                                <select class="form-select" name="tag" id="createTagSelect">
+                                    <option value="">-- Tanpa Tag --</option>
+                                    <% if (tags != null) {
+                                        for (String tag : tags) { %>
+                                    <option value="<%= tag %>"><%= tag %></option>
+                                    <% }
+                                    } %>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary" onclick="showNewTagInput()">
+                                    <i class="bi bi-plus"></i> Tag Baru
+                                </button>
+                            </div>
+                            <div id="newTagInputWrapper" class="mt-2" style="display: none;">
+                                <input type="text" class="form-control" name="newTag" id="newTagInput"
+                                       placeholder="Masukkan nama tag baru">
+                                <small class="text-muted">Tag baru akan digunakan untuk user ini</small>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -403,16 +420,23 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Tag</label>
-                            <input type="text" class="form-control" name="tag" id="editTag"
-                                   list="tagListEdit" placeholder="Contoh: Kelas A, Divisi IT, dll">
-                            <datalist id="tagListEdit">
-                                <% if (tags != null) {
-                                    for (String tag : tags) { %>
-                                <option value="<%= tag %>">
-                                <% }
-                                } %>
-                            </datalist>
-                            <small class="text-muted">Tag untuk mengelompokkan user (opsional)</small>
+                            <div class="input-group">
+                                <select class="form-select" name="tag" id="editTagSelect">
+                                    <option value="">-- Tanpa Tag --</option>
+                                    <% if (tags != null) {
+                                        for (String tag : tags) { %>
+                                    <option value="<%= tag %>"><%= tag %></option>
+                                    <% }
+                                    } %>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary" onclick="showEditNewTagInput()">
+                                    <i class="bi bi-plus"></i> Tag Baru
+                                </button>
+                            </div>
+                            <div id="editNewTagInputWrapper" class="mt-2" style="display: none;">
+                                <input type="text" class="form-control" name="newTag" id="editNewTagInput"
+                                       placeholder="Masukkan nama tag baru">
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -452,6 +476,136 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Tag Modal -->
+    <div class="modal fade" id="createTagModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title"><i class="bi bi-tag me-2"></i>Kelola Tag</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Existing Tags -->
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Tag yang Tersedia</h6>
+                        <div id="existingTagsList" class="d-flex flex-wrap gap-2">
+                            <% if (tags != null && !tags.isEmpty()) {
+                                for (String tag : tags) { %>
+                            <span class="badge bg-info fs-6 p-2">
+                                <i class="bi bi-tag me-1"></i><%= tag %>
+                            </span>
+                            <% }
+                            } else { %>
+                            <span class="text-muted">Belum ada tag</span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Add New Tag Form -->
+                    <div class="border-top pt-3">
+                        <h6 class="text-muted mb-3">Tambah Tag Baru</h6>
+                        <form id="createTagForm" onsubmit="return createTag(event)">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="newTagName"
+                                       placeholder="Nama tag baru (contoh: Kelas A, Divisi IT)" required>
+                                <button type="submit" class="btn btn-info text-white">
+                                    <i class="bi bi-plus-lg me-1"></i>Tambah
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import CSV Modal -->
+    <div class="modal fade" id="importCsvModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-upload me-2"></i>Import User dari CSV</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="../AdminServlet" method="post" enctype="multipart/form-data" id="importCsvForm">
+                    <input type="hidden" name="action" value="importUsers">
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Format CSV:</strong>
+                            <ul class="mb-0 mt-2 small">
+                                <li><strong>nama</strong> - Nama lengkap user</li>
+                                <li><strong>email</strong> - Email user (harus unik)</li>
+                                <li><strong>password</strong> - Password (minimal 6 karakter)</li>
+                                <li><strong>role</strong> - Role: "peserta" atau "admin" (default: peserta)</li>
+                                <li><strong>tag</strong> - Tag user (opsional)</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Pilih File CSV</label>
+                            <input type="file" class="form-control" name="csvFile" accept=".csv" required>
+                            <small class="text-muted">Format file: .csv (Max 5MB)</small>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="skipHeader" id="skipHeader" checked>
+                            <label class="form-check-label" for="skipHeader">
+                                Lewati baris pertama (header)
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="updateExisting" id="updateExisting">
+                            <label class="form-check-label" for="updateExisting">
+                                Update user jika email sudah ada
+                            </label>
+                        </div>
+
+                        <div id="importPreview" class="mt-3" style="display: none;">
+                            <h6>Preview Data:</h6>
+                            <div class="table-responsive" style="max-height: 200px;">
+                                <table class="table table-sm table-bordered" id="previewTable">
+                                    <thead class="table-light">
+                                        <tr><th>Nama</th><th>Email</th><th>Role</th><th>Tag</th></tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload me-1"></i>Import
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Result Modal -->
+    <div class="modal fade" id="importResultModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-check-circle me-2"></i>Hasil Import</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="importResultBody">
+                    <!-- Will be filled dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Tutup</button>
+                </div>
             </div>
         </div>
     </div>
@@ -507,7 +661,25 @@
             document.getElementById('editName').value = name;
             document.getElementById('editEmail').value = email;
             document.getElementById('editRole').value = role;
-            document.getElementById('editTag').value = tag || '';
+
+            // Set tag select value
+            var tagSelect = document.getElementById('editTagSelect');
+            var tagFound = false;
+            for (var i = 0; i < tagSelect.options.length; i++) {
+                if (tagSelect.options[i].value === tag) {
+                    tagSelect.selectedIndex = i;
+                    tagFound = true;
+                    break;
+                }
+            }
+            if (!tagFound) {
+                tagSelect.selectedIndex = 0; // Select "-- Tanpa Tag --"
+            }
+
+            // Hide new tag input wrapper
+            document.getElementById('editNewTagInputWrapper').style.display = 'none';
+            document.getElementById('editNewTagInput').value = '';
+
             new bootstrap.Modal(document.getElementById('editUserModal')).show();
         }
 
@@ -516,6 +688,116 @@
             document.getElementById('resetPasswordUserName').textContent = userName;
             new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
         }
+
+        function showNewTagInput() {
+            var wrapper = document.getElementById('newTagInputWrapper');
+            var input = document.getElementById('newTagInput');
+            wrapper.style.display = 'block';
+            input.focus();
+            // Deselect the dropdown
+            document.getElementById('createTagSelect').selectedIndex = 0;
+        }
+
+        function showEditNewTagInput() {
+            var wrapper = document.getElementById('editNewTagInputWrapper');
+            var input = document.getElementById('editNewTagInput');
+            wrapper.style.display = 'block';
+            input.focus();
+            // Deselect the dropdown
+            document.getElementById('editTagSelect').selectedIndex = 0;
+        }
+
+        function createTag(event) {
+            event.preventDefault();
+            var tagName = document.getElementById('newTagName').value.trim();
+
+            if (!tagName) {
+                alert('Nama tag tidak boleh kosong');
+                return false;
+            }
+
+            fetch('../AdminServlet?action=createTag&tagName=' + encodeURIComponent(tagName), {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Add new tag to the list
+                    var tagsList = document.getElementById('existingTagsList');
+                    var newBadge = document.createElement('span');
+                    newBadge.className = 'badge bg-info fs-6 p-2';
+                    newBadge.innerHTML = '<i class="bi bi-tag me-1"></i>' + tagName;
+                    tagsList.appendChild(newBadge);
+
+                    // Add to both select dropdowns
+                    addTagToSelect('createTagSelect', tagName);
+                    addTagToSelect('editTagSelect', tagName);
+
+                    // Clear input
+                    document.getElementById('newTagName').value = '';
+
+                    alert('Tag "' + tagName + '" berhasil dibuat!');
+                } else {
+                    alert('Gagal membuat tag: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+
+            return false;
+        }
+
+        function addTagToSelect(selectId, tagName) {
+            var select = document.getElementById(selectId);
+            var option = document.createElement('option');
+            option.value = tagName;
+            option.textContent = tagName;
+            select.appendChild(option);
+        }
+
+        // Handle form submission to use new tag if provided
+        document.addEventListener('DOMContentLoaded', function() {
+            var createUserForm = document.querySelector('#createUserModal form');
+            if (createUserForm) {
+                createUserForm.addEventListener('submit', function(e) {
+                    var newTagInput = document.getElementById('newTagInput');
+                    var tagSelect = document.getElementById('createTagSelect');
+
+                    if (newTagInput && newTagInput.value.trim()) {
+                        // Use new tag value instead of select
+                        var hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'tag';
+                        hiddenInput.value = newTagInput.value.trim();
+                        this.appendChild(hiddenInput);
+
+                        // Remove select name to avoid conflict
+                        tagSelect.removeAttribute('name');
+                    }
+                });
+            }
+
+            var editUserForm = document.querySelector('#editUserModal form');
+            if (editUserForm) {
+                editUserForm.addEventListener('submit', function(e) {
+                    var newTagInput = document.getElementById('editNewTagInput');
+                    var tagSelect = document.getElementById('editTagSelect');
+
+                    if (newTagInput && newTagInput.value.trim()) {
+                        // Use new tag value instead of select
+                        var hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'tag';
+                        hiddenInput.value = newTagInput.value.trim();
+                        this.appendChild(hiddenInput);
+
+                        // Remove select name to avoid conflict
+                        tagSelect.removeAttribute('name');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

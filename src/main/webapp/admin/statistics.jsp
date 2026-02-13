@@ -272,7 +272,7 @@
         </div>
 
         <!-- Additional Stats -->
-        <div class="row">
+        <div class="row mb-4">
             <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-header">
@@ -342,22 +342,73 @@
 
         <!-- Participant List Table -->
         <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h6 class="mb-0"><i class="bi bi-people me-2"></i>Daftar Peserta & Nilai</h6>
                 <% if (submissions != null && !submissions.isEmpty()) { %>
-                <button class="btn btn-outline-primary btn-sm" onclick="exportAllToPdf()">
-                    <i class="bi bi-file-earmark-pdf me-1"></i>Export Semua PDF
-                </button>
+                <div class="d-flex gap-2 flex-wrap">
+                    <span class="badge bg-secondary" id="totalCount">Total: <%= submissions.size() %> peserta</span>
+                    <button class="btn btn-outline-primary btn-sm" onclick="exportAllToPdf()">
+                        <i class="bi bi-file-earmark-pdf me-1"></i>Export PDF
+                    </button>
+                </div>
                 <% } %>
             </div>
             <div class="card-body">
                 <% if (submissions != null && !submissions.isEmpty()) { %>
+                <!-- Search and Filter -->
+                <div class="row mb-3 g-2">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Cari nama peserta..." onkeyup="filterTable()">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="tagFilter" onchange="filterTable()">
+                            <option value="">Semua Tag</option>
+                            <%
+                                // Collect unique tags from submissions
+                                java.util.Set<String> uniqueTags = new java.util.TreeSet<>();
+                                for (Map<String, Object> sub : submissions) {
+                                    String tag = (String) sub.get("userTag");
+                                    if (tag != null && !tag.isEmpty()) {
+                                        uniqueTags.add(tag);
+                                    }
+                                }
+                                for (String tag : uniqueTags) {
+                            %>
+                            <option value="<%= tag %>"><%= tag %></option>
+                            <% } %>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="scoreFilter" onchange="filterTable()">
+                            <option value="">Semua Nilai</option>
+                            <option value="pass">Lulus (>= 60)</option>
+                            <option value="fail">Tidak Lulus (< 60)</option>
+                            <option value="excellent">Sangat Baik (>= 86)</option>
+                            <option value="good">Baik (76-85)</option>
+                            <option value="fair">Cukup (61-75)</option>
+                            <option value="poor">Kurang (< 61)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="pageSize" onchange="changePageSize()">
+                            <option value="25">25 / halaman</option>
+                            <option value="50" selected>50 / halaman</option>
+                            <option value="100">100 / halaman</option>
+                            <option value="all">Semua</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover" id="participantsTable">
                         <thead class="table-light">
                             <tr>
                                 <th class="text-center" width="50">No</th>
                                 <th>Nama Peserta</th>
+                                <th>Tag</th>
                                 <th class="text-center">Nilai</th>
                                 <th class="text-center">Benar</th>
                                 <th class="text-center">Salah</th>
@@ -366,17 +417,27 @@
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="participantsBody">
                             <% int no = 1;
                                for (Map<String, Object> sub : submissions) {
                                    Double score = (Double) sub.get("score");
                                    String scoreClass = score >= 86 ? "success" : score >= 76 ? "primary" :
                                                        score >= 61 ? "info" : score >= 41 ? "warning" : "danger";
+                                   String userTag = (String) sub.get("userTag");
                             %>
-                            <tr>
+                            <tr data-name="<%= sub.get("userName") != null ? ((String)sub.get("userName")).toLowerCase() : "" %>"
+                                data-tag="<%= userTag != null ? userTag : "" %>"
+                                data-score="<%= score %>">
                                 <td class="text-center"><%= no++ %></td>
                                 <td>
                                     <strong><%= sub.get("userName") %></strong>
+                                </td>
+                                <td>
+                                    <% if (userTag != null && !userTag.isEmpty()) { %>
+                                    <span class="badge bg-info"><i class="bi bi-tag me-1"></i><%= userTag %></span>
+                                    <% } else { %>
+                                    <span class="text-muted">-</span>
+                                    <% } %>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge bg-<%= scoreClass %>">
@@ -397,7 +458,7 @@
                                 </td>
                                 <td class="text-center">
                                     <button class="btn btn-sm btn-outline-primary"
-                                            onclick="loadUserDetail(<%= sub.get("id") %>)"
+                                            onclick="loadUserDetail('<%= sub.get("id") %>')"
                                             title="Lihat Detail">
                                         <i class="bi bi-eye"></i> Detail
                                     </button>
@@ -407,6 +468,15 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination -->
+                <div id="paginationWrapper" class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="text-muted small" id="showingInfo"></div>
+                    <nav id="paginationNav">
+                        <ul class="pagination pagination-sm mb-0" id="paginationList"></ul>
+                    </nav>
+                </div>
+
                 <% } else { %>
                 <div class="text-center py-4 text-muted">
                     <i class="bi bi-inbox display-4 d-block mb-2"></i>
@@ -457,8 +527,44 @@
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
+        <div id="toastNotification" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi me-2" id="toastIcon"></i>
+                    <span id="toastMessage"></span>
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <% if (statistics != null) { %>
     <script>
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toastEl = document.getElementById('toastNotification');
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+
+            // Set icon and color based on type
+            const types = {
+                success: { icon: 'bi-check-circle-fill', class: 'text-success bg-success bg-opacity-10' },
+                danger: { icon: 'bi-x-circle-fill', class: 'text-danger bg-danger bg-opacity-10' },
+                warning: { icon: 'bi-exclamation-triangle-fill', class: 'text-warning bg-warning bg-opacity-10' },
+                info: { icon: 'bi-info-circle-fill', class: 'text-info bg-info bg-opacity-10' }
+            };
+
+            const config = types[type] || types.info;
+            toastIcon.className = 'bi ' + config.icon;
+            toastMessage.textContent = message;
+            toastEl.className = 'toast align-items-center border-0 ' + config.class;
+
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+            toast.show();
+        }
+
         // Score Distribution Chart
         const scoreCtx = document.getElementById('scoreDistributionChart').getContext('2d');
         new Chart(scoreCtx, {
@@ -543,12 +649,20 @@
 
         // Load user detail via AJAX
         function loadUserDetail(submissionId) {
+            console.log('Loading user detail for submission:', submissionId);
+
+            if (!submissionId) {
+                showToast('Submission ID tidak valid', 'warning');
+                return;
+            }
+
             const modal = new bootstrap.Modal(document.getElementById('userDetailModal'));
             document.getElementById('userDetailBody').innerHTML = `
                 <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
+                    <p class="text-muted mt-3">Memuat data...</p>
                 </div>
             `;
             modal.show();
@@ -566,9 +680,17 @@
                 })
                 .catch(error => {
                     document.getElementById('userDetailBody').innerHTML = `
-                        <div class="alert alert-danger">
-                            <i class="bi bi-exclamation-triangle me-2"></i>
-                            Gagal memuat data: ${error.message}
+                        <div id="userDetailContent">
+                            <div class="text-center py-5">
+                                <div class="mb-4">
+                                    <i class="bi bi-exclamation-triangle display-1 text-danger"></i>
+                                </div>
+                                <h4 class="text-muted mb-3">Gagal Memuat Data</h4>
+                                <p class="text-muted">${error.message}</p>
+                                <button class="btn btn-outline-primary btn-sm" onclick="loadUserDetail('${submissionId}')">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Coba Lagi
+                                </button>
+                            </div>
                         </div>
                     `;
                 });
@@ -659,7 +781,7 @@
         function exportAllToPdf() {
             const table = document.getElementById('participantsTable');
             if (!table) {
-                alert('Tabel tidak ditemukan');
+                showToast('Tabel tidak ditemukan', 'warning');
                 return;
             }
 
@@ -682,6 +804,188 @@
 
             html2pdf().set(opt).from(wrapper).save();
         }
+
+        // Filter and Pagination
+        let currentPage = 1;
+        let filteredRows = [];
+
+        function filterTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const tagFilter = document.getElementById('tagFilter').value;
+            const scoreFilter = document.getElementById('scoreFilter').value;
+            const tbody = document.getElementById('participantsBody');
+            const allRows = Array.from(tbody.getElementsByTagName('tr'));
+
+            filteredRows = allRows.filter(row => {
+                const name = row.dataset.name || '';
+                const tag = row.dataset.tag || '';
+                const score = parseFloat(row.dataset.score) || 0;
+
+                // Search filter
+                const matchesSearch = name.includes(searchTerm);
+
+                // Tag filter
+                const matchesTag = !tagFilter || tag === tagFilter;
+
+                // Score filter
+                let matchesScore = true;
+                if (scoreFilter) {
+                    switch(scoreFilter) {
+                        case 'pass': matchesScore = score >= 60; break;
+                        case 'fail': matchesScore = score < 60; break;
+                        case 'excellent': matchesScore = score >= 86; break;
+                        case 'good': matchesScore = score >= 76 && score < 86; break;
+                        case 'fair': matchesScore = score >= 61 && score < 76; break;
+                        case 'poor': matchesScore = score < 61; break;
+                    }
+                }
+
+                return matchesSearch && matchesTag && matchesScore;
+            });
+
+            // Update filtered count
+            document.getElementById('totalCount').textContent = `Ditemukan: ${filteredRows.length} peserta`;
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('participantsBody');
+            const allRows = Array.from(tbody.getElementsByTagName('tr'));
+            const pageSize = document.getElementById('pageSize').value;
+
+            // Hide all rows first
+            allRows.forEach(row => row.style.display = 'none');
+
+            // Calculate pagination
+            let rowsToShow;
+            let totalPages;
+
+            if (pageSize === 'all') {
+                rowsToShow = filteredRows.length > 0 ? filteredRows : allRows;
+                totalPages = 1;
+            } else {
+                const size = parseInt(pageSize);
+                totalPages = Math.ceil(filteredRows.length / size);
+                const startIndex = (currentPage - 1) * size;
+                const endIndex = startIndex + size;
+                rowsToShow = filteredRows.slice(startIndex, endIndex);
+            }
+
+            // Show filtered rows for current page
+            rowsToShow.forEach((row, index) => {
+                row.style.display = '';
+                // Update row number
+                const firstCell = row.querySelector('td:first-child');
+                if (firstCell && pageSize !== 'all') {
+                    const size = parseInt(pageSize);
+                    firstCell.textContent = ((currentPage - 1) * size) + index + 1;
+                }
+            });
+
+            // Update showing info
+            const pageSizeVal = pageSize === 'all' ? filteredRows.length : parseInt(pageSize);
+            const startItem = filteredRows.length > 0 ? ((currentPage - 1) * pageSizeVal) + 1 : 0;
+            const endItem = pageSize === 'all' ? filteredRows.length : Math.min(currentPage * pageSizeVal, filteredRows.length);
+            document.getElementById('showingInfo').textContent =
+                `Menampilkan ${startItem}-${endItem} dari ${filteredRows.length} peserta`;
+
+            // Render pagination
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const paginationList = document.getElementById('paginationList');
+            paginationList.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // Previous button
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage - 1}); return false;"><i class="bi bi-chevron-left"></i></a>`;
+            paginationList.appendChild(prevLi);
+
+            // Page numbers
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+            if (endPage - startPage < maxVisible - 1) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+
+            if (startPage > 1) {
+                const li = document.createElement('li');
+                li.className = 'page-item';
+                li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(1); return false;">1</a>`;
+                paginationList.appendChild(li);
+
+                if (startPage > 2) {
+                    const ellipsis = document.createElement('li');
+                    ellipsis.className = 'page-item disabled';
+                    ellipsis.innerHTML = `<span class="page-link">...</span>`;
+                    paginationList.appendChild(ellipsis);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i}</a>`;
+                paginationList.appendChild(li);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsis = document.createElement('li');
+                    ellipsis.className = 'page-item disabled';
+                    ellipsis.innerHTML = `<span class="page-link">...</span>`;
+                    paginationList.appendChild(ellipsis);
+                }
+
+                const li = document.createElement('li');
+                li.className = 'page-item';
+                li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${totalPages}); return false;">${totalPages}</a>`;
+                paginationList.appendChild(li);
+            }
+
+            // Next button
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage + 1}); return false;"><i class="bi bi-chevron-right"></i></a>`;
+            paginationList.appendChild(nextLi);
+        }
+
+        function goToPage(page) {
+            const pageSize = document.getElementById('pageSize').value;
+            const size = pageSize === 'all' ? filteredRows.length : parseInt(pageSize);
+            const totalPages = Math.ceil(filteredRows.length / size);
+
+            if (page < 1 || page > totalPages) return;
+
+            currentPage = page;
+            renderTable();
+
+            // Scroll to table
+            document.getElementById('participantsTable').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function changePageSize() {
+            currentPage = 1;
+            filterTable();
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize filtered rows with all rows
+            const tbody = document.getElementById('participantsBody');
+            if (tbody) {
+                filteredRows = Array.from(tbody.getElementsByTagName('tr'));
+                renderTable();
+            }
+        });
     </script>
     <% } %>
 </body>

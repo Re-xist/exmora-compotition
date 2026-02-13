@@ -309,6 +309,17 @@ public class UserService {
     }
 
     /**
+     * Find user by email
+     */
+    public User findByEmail(String email) throws ServiceException {
+        try {
+            return userDAO.findByEmail(email);
+        } catch (SQLException e) {
+            throw new ServiceException("Gagal mencari user: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Update user profile with photo
      */
     public User updateProfileWithPhoto(Integer id, String name, String email, String uploadDir, Part photoPart)

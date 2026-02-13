@@ -82,6 +82,7 @@
                                 <th>Judul</th>
                                 <th>Durasi</th>
                                 <th>Soal</th>
+                                <th>Target</th>
                                 <th>Deadline</th>
                                 <th>Status</th>
                                 <th>Aksi</th>
@@ -100,6 +101,16 @@
                                 </td>
                                 <td><%= quiz.getDuration() %> menit</td>
                                 <td><span class="badge bg-info"><%= quiz.getQuestionCount() %> soal</span></td>
+                                <td>
+                                    <% if (quiz.getTargetTag() != null && !quiz.getTargetTag().isEmpty()) {
+                                        String[] targetTags = quiz.getTargetTag().split(",");
+                                        for (String tag : targetTags) { %>
+                                    <span class="badge bg-primary me-1"><%= tag.trim() %></span>
+                                    <% }
+                                    } else { %>
+                                    <span class="badge bg-secondary">Semua</span>
+                                    <% } %>
+                                </td>
                                 <td>
                                     <% if (quiz.getDeadline() != null) { %>
                                         <% if (quiz.isExpired()) { %>

@@ -287,6 +287,44 @@ public class SubmissionService {
     }
 
     /**
+     * Get detailed quiz results with participant list
+     */
+    public List<Map<String, Object>> getDetailedQuizResults(Integer quizId) throws ServiceException {
+        try {
+            List<Map<String, Object>> submissions = submissionDAO.getDetailedSubmissionsByQuiz(quizId);
+
+            // Update unanswered count for each submission
+            for (Map<String, Object> sub : submissions) {
+                Integer submissionId = (Integer) sub.get("id");
+                int answeredCount = submissionDAO.getAnsweredCount(submissionId);
+                int totalQuestions = (Integer) sub.get("totalQuestions");
+                int correctAnswers = (Integer) sub.get("correctAnswers");
+                int wrongCount = answeredCount - correctAnswers;
+                int unanswered = totalQuestions - answeredCount;
+
+                sub.put("answeredCount", answeredCount);
+                sub.put("wrongCount", wrongCount);
+                sub.put("unanswered", unanswered);
+            }
+
+            return submissions;
+        } catch (SQLException e) {
+            throw new ServiceException("Gagal mengambil hasil quiz: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get submission detail with all questions and answers
+     */
+    public Map<String, Object> getSubmissionDetail(Integer submissionId) throws ServiceException {
+        try {
+            return submissionDAO.getSubmissionDetailWithAnswers(submissionId);
+        } catch (SQLException e) {
+            throw new ServiceException("Gagal mengambil detail submission: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Service Exception
      */
     public static class ServiceException extends Exception {
