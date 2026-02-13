@@ -21,7 +21,7 @@ public class AuthFilter implements Filter {
     };
 
     private static final String[] ADMIN_PATHS = {
-            "/admin/", "/AdminServlet", "/QuizServlet", "/QuestionServlet"
+            "/admin/", "/AdminServlet", "/QuizServlet", "/QuestionServlet", "/ArenaServlet"
     };
 
     @Override

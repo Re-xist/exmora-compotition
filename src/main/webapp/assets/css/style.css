@@ -334,3 +334,174 @@ body {
         margin-left: 0 !important;
     }
 }
+
+/* ================== Arena Styles ================== */
+
+/* Arena gradient theme */
+.bg-arena-gradient {
+    background: linear-gradient(135deg, #7c3aed 0%, #f97316 100%);
+}
+
+/* Arena button */
+.btn-arena {
+    background: linear-gradient(135deg, #7c3aed 0%, #f97316 100%);
+    border: none;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-arena:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+    color: white;
+}
+
+.btn-outline-arena {
+    border: 2px solid #7c3aed;
+    color: #7c3aed;
+    background: transparent;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-arena:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #f97316 100%);
+    border-color: transparent;
+    color: white;
+}
+
+/* Arena text color */
+.text-arena {
+    color: #7c3aed;
+}
+
+/* Arena code badge */
+.bg-arena-code {
+    background: linear-gradient(135deg, #7c3aed 0%, #f97316 100%);
+    color: white;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+}
+
+/* Arena card */
+.arena-card {
+    border-left: 4px solid #7c3aed;
+}
+
+.arena-card:hover {
+    border-left-color: #f97316;
+}
+
+/* Arena badge */
+.bg-arena {
+    background: linear-gradient(135deg, #7c3aed 0%, #f97316 100%);
+    color: white;
+}
+
+/* Arena stats card */
+.arena-stat-card {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+/* Timer animation */
+.arena-timer-critical {
+    animation: timer-pulse 0.5s infinite;
+}
+
+@keyframes timer-pulse {
+    0%, 100% {
+        color: #ef476f;
+        transform: scale(1);
+    }
+    50% {
+        color: #dc2626;
+        transform: scale(1.1);
+    }
+}
+
+/* Leaderboard animation */
+.leaderboard-item {
+    transition: all 0.3s ease;
+}
+
+.leaderboard-item:hover {
+    background-color: rgba(124, 58, 237, 0.05);
+}
+
+/* Rank badges */
+.rank-1 {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+    color: #000;
+}
+
+.rank-2 {
+    background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%);
+    color: #000;
+}
+
+.rank-3 {
+    background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%);
+    color: #fff;
+}
+
+/* Option buttons for arena */
+.arena-option {
+    padding: 1rem 1.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 0.75rem;
+    text-align: left;
+}
+
+.arena-option:hover:not(.disabled) {
+    border-color: #7c3aed;
+    background-color: rgba(124, 58, 237, 0.05);
+    transform: translateX(5px);
+}
+
+.arena-option.selected {
+    border-color: #7c3aed;
+    background-color: rgba(124, 58, 237, 0.1);
+}
+
+.arena-option.correct {
+    border-color: var(--success-color);
+    background-color: rgba(6, 214, 160, 0.2);
+}
+
+.arena-option.incorrect {
+    border-color: var(--danger-color);
+    background-color: rgba(239, 71, 111, 0.2);
+}
+
+.arena-option.disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Waiting animation */
+.waiting-pulse {
+    animation: waiting-glow 2s infinite;
+}
+
+@keyframes waiting-glow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 20px rgba(124, 58, 237, 0);
+    }
+}
+
+/* Arena progress bar */
+.progress-bar-arena {
+    background: linear-gradient(135deg, #7c3aed 0%, #f97316 100%);
+}

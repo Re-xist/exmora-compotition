@@ -50,6 +50,11 @@
                 </a>
             </li>
             <li>
+                <a href="../ArenaServlet?action=list">
+                    <i class="bi bi-trophy"></i>Kelola Arena
+                </a>
+            </li>
+            <li>
                 <a href="../AdminServlet?action=users">
                     <i class="bi bi-people"></i>Kelola User
                 </a>
