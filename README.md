@@ -64,7 +64,7 @@ Platform ini dilengkapi dengan fitur **Quiz Online**, **Arena Mode** (kompetisi 
 
 ### 7. Riwayat Ujian
 - History lengkap semua pengerjaan
-- Review jawaban dan pembahasan
+- Review jawaban dengan teks pilihan jawaban
 - Detail skor per quiz
 - Waktu pengerjaan tersimpan
 
@@ -80,11 +80,6 @@ Platform ini dilengkapi dengan fitur **Quiz Online**, **Arena Mode** (kompetisi 
 - Single submit enforcement
 - Secure database handling
 - Password hashing (SHA-256 with salt)
-
-### 10. Profil & Settings
-- Upload foto profil
-- Ganti password
-- Edit profil peserta
 
 ---
 

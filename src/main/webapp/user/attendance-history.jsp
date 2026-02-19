@@ -32,7 +32,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="dashboard.jsp">
+            <a class="navbar-brand fw-bold" href="../ExamServlet?action=dashboard">
                 <i class="bi bi-journal-check me-2"></i>Examora
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -74,9 +74,6 @@
                     <% } %>
                 </ul>
                 <div class="d-flex align-items-center">
-                    <a href="../SettingsServlet" class="text-white text-decoration-none me-3">
-                        <i class="bi bi-person-circle me-1"></i><%= currentUser.getName() %>
-                    </a>
                     <a href="../LogoutServlet" class="btn btn-outline-light btn-sm">
                         <i class="bi bi-box-arrow-left me-1"></i>Logout
                     </a>

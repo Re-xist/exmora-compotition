@@ -28,7 +28,7 @@
 <body>
     <!-- Sidebar -->
     <nav class="sidebar">
-        <a href="../index.jsp" class="sidebar-brand">
+        <a href="../AdminServlet?action=dashboard" class="sidebar-brand">
             <i class="bi bi-journal-check me-2"></i>Examora
         </a>
         <hr class="sidebar-divider bg-white opacity-25">
@@ -39,7 +39,6 @@
             <li><a href="../AdminServlet?action=users" class="active"><i class="bi bi-people"></i>Kelola User</a></li>
             <li><a href="../AttendanceServlet?action=list"><i class="bi bi-check2-square"></i>Absensi</a></li>
             <li><a href="../AdminServlet?action=statistics"><i class="bi bi-graph-up"></i>Statistik</a></li>
-            <li><a href="../SettingsServlet"><i class="bi bi-gear"></i>Pengaturan</a></li>
             <li class="mt-5"><a href="../LogoutServlet"><i class="bi bi-box-arrow-left"></i>Logout</a></li>
         </ul>
     </nav>

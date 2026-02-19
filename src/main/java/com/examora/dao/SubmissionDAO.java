@@ -217,7 +217,8 @@ public class SubmissionDAO {
      * Get answers for a submission
      */
     public List<Answer> getAnswers(Integer submissionId) throws SQLException {
-        String sql = "SELECT a.*, q.question_text, q.correct_answer " +
+        String sql = "SELECT a.*, q.question_text, q.correct_answer, " +
+                     "q.option_a, q.option_b, q.option_c, q.option_d " +
                      "FROM answers a " +
                      "LEFT JOIN questions q ON a.question_id = q.id " +
                      "WHERE a.submission_id = ?";
@@ -238,6 +239,10 @@ public class SubmissionDAO {
                     answer.setIsCorrect(rs.getBoolean("is_correct"));
                     answer.setQuestionText(rs.getString("question_text"));
                     answer.setCorrectAnswer(rs.getString("correct_answer"));
+                    answer.setOptionA(rs.getString("option_a"));
+                    answer.setOptionB(rs.getString("option_b"));
+                    answer.setOptionC(rs.getString("option_c"));
+                    answer.setOptionD(rs.getString("option_d"));
 
                     Timestamp answeredAt = rs.getTimestamp("answered_at");
                     if (answeredAt != null) {

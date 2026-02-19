@@ -314,27 +314,6 @@
                     </div>
                 </div>
 
-                <!-- Profile Management -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="feature-icon bg-purple text-white rounded-circle mb-3" style="background-color: #6f42c1;">
-                                <i class="bi bi-person-circle"></i>
-                            </div>
-                            <h5 class="card-title">Profil & Foto</h5>
-                            <p class="card-text text-muted">
-                                Peserta dapat mengelola profil, mengganti foto,
-                                dan mengupdate password dengan mudah.
-                            </p>
-                            <ul class="list-unstyled text-muted small mb-0">
-                                <li><i class="bi bi-check text-success me-1"></i>Upload foto profil</li>
-                                <li><i class="bi bi-check text-success me-1"></i>Change password</li>
-                                <li><i class="bi bi-check text-success me-1"></i>Edit profil</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Attendance System -->
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-0 shadow-sm">

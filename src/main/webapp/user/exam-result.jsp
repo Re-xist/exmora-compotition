@@ -184,7 +184,7 @@
                                 <p class="mb-1">
                                     <strong>Jawaban Anda:</strong>
                                     <span class="<%= isCorrect ? "text-success" : "text-danger" %>">
-                                        <%= hasAnswer ? userAnswer : "Tidak dijawab" %>
+                                        <%= hasAnswer ? userAnswer + ". " + (ans.getSelectedAnswerText() != null ? ans.getSelectedAnswerText() : "") : "Tidak dijawab" %>
                                     </span>
                                 </p>
                             </div>
@@ -192,7 +192,7 @@
                             <div class="col-md-6">
                                 <p class="mb-1">
                                     <strong>Jawaban Benar:</strong>
-                                    <span class="text-success"><%= ans.getCorrectAnswer() != null ? ans.getCorrectAnswer() : "-" %></span>
+                                    <span class="text-success"><%= ans.getCorrectAnswer() != null ? ans.getCorrectAnswer() + ". " + (ans.getCorrectAnswerText() != null ? ans.getCorrectAnswerText() : "") : "-" %></span>
                                 </p>
                             </div>
                             <% } %>

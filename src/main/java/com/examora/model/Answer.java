@@ -17,6 +17,12 @@ public class Answer {
     private String questionText;
     private String correctAnswer;
 
+    // Option texts for display
+    private String optionA;
+    private String optionB;
+    private String optionC;
+    private String optionD;
+
     // Constructors
     public Answer() {}
 
@@ -89,6 +95,60 @@ public class Answer {
 
     public void setCorrectAnswer(String correctAnswer) {
         this.correctAnswer = correctAnswer;
+    }
+
+    public String getOptionA() {
+        return optionA;
+    }
+
+    public void setOptionA(String optionA) {
+        this.optionA = optionA;
+    }
+
+    public String getOptionB() {
+        return optionB;
+    }
+
+    public void setOptionB(String optionB) {
+        this.optionB = optionB;
+    }
+
+    public String getOptionC() {
+        return optionC;
+    }
+
+    public void setOptionC(String optionC) {
+        this.optionC = optionC;
+    }
+
+    public String getOptionD() {
+        return optionD;
+    }
+
+    public void setOptionD(String optionD) {
+        this.optionD = optionD;
+    }
+
+    // Helper method to get option text by letter
+    public String getOptionText(String option) {
+        if (option == null) return null;
+        switch (option.toUpperCase()) {
+            case "A": return optionA;
+            case "B": return optionB;
+            case "C": return optionC;
+            case "D": return optionD;
+            default: return null;
+        }
+    }
+
+    // Helper method to get selected answer text
+    public String getSelectedAnswerText() {
+        return getOptionText(selectedAnswer);
+    }
+
+    // Helper method to get correct answer text
+    public String getCorrectAnswerText() {
+        return getOptionText(correctAnswer);
     }
 
     @Override

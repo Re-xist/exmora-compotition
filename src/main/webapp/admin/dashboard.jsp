@@ -36,7 +36,7 @@
 <body>
     <!-- Sidebar -->
     <nav class="sidebar">
-        <a href="../index.jsp" class="sidebar-brand">
+        <a href="../AdminServlet?action=dashboard" class="sidebar-brand">
             <i class="bi bi-journal-check me-2"></i>Examora
         </a>
         <hr class="sidebar-divider bg-white opacity-25">
@@ -72,9 +72,6 @@
                 </a>
             </li>
             <li>
-                <a href="../SettingsServlet">
-                    <i class="bi bi-gear"></i>Pengaturan
-                </a>
             </li>
             <li class="mt-5">
                 <a href="../LogoutServlet">
