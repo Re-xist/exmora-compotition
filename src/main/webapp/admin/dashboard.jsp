@@ -14,6 +14,8 @@
     Integer totalAdmins = (Integer) request.getAttribute("totalAdmins");
     Integer totalQuizzes = (Integer) request.getAttribute("totalQuizzes");
     Integer totalSubmissions = (Integer) request.getAttribute("totalSubmissions");
+    Integer totalAttendanceSessions = (Integer) request.getAttribute("totalAttendanceSessions");
+    Integer activeAttendanceSessions = (Integer) request.getAttribute("activeAttendanceSessions");
     List<?> quizzes = (List<?>) request.getAttribute("quizzes");
     List<?> submissions = (List<?>) request.getAttribute("submissions");
 
@@ -57,6 +59,11 @@
             <li>
                 <a href="../AdminServlet?action=users">
                     <i class="bi bi-people"></i>Kelola User
+                </a>
+            </li>
+            <li>
+                <a href="../AttendanceServlet?action=list">
+                    <i class="bi bi-check2-square"></i>Absensi
                 </a>
             </li>
             <li>
@@ -108,8 +115,8 @@
 
         <!-- Stats Cards -->
         <div class="row g-4 mb-4">
-            <div class="col-md-3">
-                <div class="card stat-card bg-primary text-white">
+            <div class="col-lg-3 col-md-6">
+                <div class="card stat-card bg-primary text-white h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -121,8 +128,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stat-card bg-success text-white">
+            <div class="col-lg-3 col-md-6">
+                <div class="card stat-card bg-success text-white h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -134,8 +141,22 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card stat-card bg-info text-white">
+            <div class="col-lg-3 col-md-6">
+                <div class="card stat-card bg-info text-white h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-1 opacity-75">Sesi Absensi</p>
+                                <h2 class="stat-value mb-0"><%= totalAttendanceSessions != null ? totalAttendanceSessions : 0 %></h2>
+                                <small class="opacity-75"><%= activeAttendanceSessions != null ? activeAttendanceSessions : 0 %> aktif</small>
+                            </div>
+                            <i class="bi bi-check2-square stat-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card stat-card bg-warning text-white h-100">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -143,19 +164,6 @@
                                 <h2 class="stat-value mb-0"><%= totalSubmissions != null ? totalSubmissions : 0 %></h2>
                             </div>
                             <i class="bi bi-file-earmark-check stat-icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stat-card bg-warning text-white">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="mb-1 opacity-75">Total Admin</p>
-                                <h2 class="stat-value mb-0"><%= totalAdmins != null ? totalAdmins : 0 %></h2>
-                            </div>
-                            <i class="bi bi-person-badge stat-icon"></i>
                         </div>
                     </div>
                 </div>
@@ -234,10 +242,13 @@
                             <a href="../QuizServlet?action=create" class="btn btn-outline-primary">
                                 <i class="bi bi-plus-circle me-2"></i>Buat Quiz Baru
                             </a>
-                            <a href="../AdminServlet?action=users" class="btn btn-outline-success">
+                            <a href="../AttendanceServlet?action=list" class="btn btn-outline-success">
+                                <i class="bi bi-check2-square me-2"></i>Kelola Absensi
+                            </a>
+                            <a href="../AdminServlet?action=users" class="btn btn-outline-info">
                                 <i class="bi bi-people me-2"></i>Kelola User
                             </a>
-                            <a href="../AdminServlet?action=statistics" class="btn btn-outline-info">
+                            <a href="../AdminServlet?action=statistics" class="btn btn-outline-secondary">
                                 <i class="bi bi-graph-up me-2"></i>Lihat Statistik
                             </a>
                         </div>

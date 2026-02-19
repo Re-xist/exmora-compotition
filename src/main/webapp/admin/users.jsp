@@ -37,6 +37,7 @@
             <li><a href="../QuizServlet?action=list"><i class="bi bi-journal-text"></i>Kelola Quiz</a></li>
             <li><a href="../ArenaServlet?action=list"><i class="bi bi-trophy"></i>Kelola Arena</a></li>
             <li><a href="../AdminServlet?action=users" class="active"><i class="bi bi-people"></i>Kelola User</a></li>
+            <li><a href="../AttendanceServlet?action=list"><i class="bi bi-check2-square"></i>Absensi</a></li>
             <li><a href="../AdminServlet?action=statistics"><i class="bi bi-graph-up"></i>Statistik</a></li>
             <li><a href="../SettingsServlet"><i class="bi bi-gear"></i>Pengaturan</a></li>
             <li class="mt-5"><a href="../LogoutServlet"><i class="bi bi-box-arrow-left"></i>Logout</a></li>
@@ -56,6 +57,9 @@
                 </nav>
             </div>
             <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#gdriveLinksModal">
+                    <i class="bi bi-google me-2"></i>Link Google Drive
+                </button>
                 <a href="../AdminServlet?action=downloadTemplate" class="btn btn-outline-success">
                     <i class="bi bi-file-earmark-spreadsheet me-2"></i>Template CSV
                 </a>
@@ -221,13 +225,15 @@
                                                 onclick="showUserDetail(<%= user.getId() %>, '<%= user.getName() %>',
                                                 '<%= user.getEmail() %>', '<%= user.getRole() %>',
                                                 '<%= user.getTag() != null ? user.getTag().replace("'", "\\'") : "" %>',
-                                                '<%= user.getCreatedAt() != null ? user.getCreatedAt().toLocalDate() : "-" %>')">
+                                                '<%= user.getCreatedAt() != null ? user.getCreatedAt().toLocalDate() : "-" %>',
+                                                '<%= user.getGdriveLink() != null ? user.getGdriveLink().replace("'", "\\'") : "" %>')">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-warning" title="Edit"
                                                 onclick="showEditModal(<%= user.getId() %>, '<%= user.getName() %>',
                                                 '<%= user.getEmail() %>', '<%= user.getRole() %>',
-                                                '<%= user.getTag() != null ? user.getTag().replace("'", "\\'") : "" %>')">
+                                                '<%= user.getTag() != null ? user.getTag().replace("'", "\\'") : "" %>',
+                                                '<%= user.getGdriveLink() != null ? user.getGdriveLink().replace("'", "\\'") : "" %>')">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-secondary" title="Reset Password"
@@ -285,6 +291,10 @@
                         <tr>
                             <td class="text-muted">Tag:</td>
                             <td id="modalTag">-</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Google Drive:</td>
+                            <td id="modalGdrive">-</td>
                         </tr>
                         <tr>
                             <td class="text-muted">Terdaftar:</td>
@@ -380,6 +390,11 @@
                                 <small class="text-muted">Tag baru akan digunakan untuk user ini</small>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Link Google Drive</label>
+                            <input type="url" class="form-control" name="gdriveLink" placeholder="https://drive.google.com/...">
+                            <small class="text-muted">Opsional: Link ke folder/file Google Drive user</small>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -438,6 +453,11 @@
                                 <input type="text" class="form-control" name="newTag" id="editNewTagInput"
                                        placeholder="Masukkan nama tag baru">
                             </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Link Google Drive</label>
+                            <input type="url" class="form-control" name="gdriveLink" id="editGdriveLink" placeholder="https://drive.google.com/...">
+                            <small class="text-muted">Opsional: Link ke folder/file Google Drive user</small>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -636,7 +656,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function showUserDetail(id, name, email, role, tag, date) {
+        function showUserDetail(id, name, email, role, tag, date, gdriveLink) {
             document.getElementById('modalAvatar').textContent = name.charAt(0).toUpperCase();
             document.getElementById('modalName').textContent = name;
             document.getElementById('modalEmail').textContent = email;
@@ -645,6 +665,9 @@
                 : '<span class="badge bg-success"><i class="bi bi-person me-1"></i>Peserta</span>';
             document.getElementById('modalTag').innerHTML = tag && tag.trim() !== ''
                 ? '<span class="badge bg-info"><i class="bi bi-tag me-1"></i>' + tag + '</span>'
+                : '<span class="text-muted">-</span>';
+            document.getElementById('modalGdrive').innerHTML = gdriveLink && gdriveLink.trim() !== ''
+                ? '<a href="' + gdriveLink + '" target="_blank" class="btn btn-sm btn-outline-danger"><i class="bi bi-google me-1"></i>Buka Link</a>'
                 : '<span class="text-muted">-</span>';
             document.getElementById('modalDate').textContent = date;
 
@@ -657,11 +680,12 @@
             new bootstrap.Modal(document.getElementById('deleteModal')).show();
         }
 
-        function showEditModal(userId, name, email, role, tag) {
+        function showEditModal(userId, name, email, role, tag, gdriveLink) {
             document.getElementById('editUserId').value = userId;
             document.getElementById('editName').value = name;
             document.getElementById('editEmail').value = email;
             document.getElementById('editRole').value = role;
+            document.getElementById('editGdriveLink').value = gdriveLink || '';
 
             // Set tag select value
             var tagSelect = document.getElementById('editTagSelect');
@@ -800,5 +824,73 @@
             }
         });
     </script>
+
+    <!-- Google Drive Links Modal -->
+    <div class="modal fade" id="gdriveLinksModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-google me-2"></i>Link Google Drive Peserta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Tag</th>
+                                    <th>Link Google Drive</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (users != null) {
+                                    boolean hasGdriveLinks = false;
+                                    for (User user : users) {
+                                        if (user.getGdriveLink() != null && !user.getGdriveLink().isEmpty()) {
+                                            hasGdriveLinks = true;
+                                %>
+                                <tr>
+                                    <td><%= user.getName() %></td>
+                                    <td>
+                                        <% if (user.getTag() != null && !user.getTag().isEmpty()) { %>
+                                        <span class="badge bg-info"><%= user.getTag() %></span>
+                                        <% } else { %>
+                                        <span class="text-muted">-</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <a href="<%= user.getGdriveLink() %>" target="_blank" class="text-truncate d-inline-block" style="max-width: 250px;">
+                                            <%= user.getGdriveLink().length() > 40 ? user.getGdriveLink().substring(0, 40) + "..." : user.getGdriveLink() %>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="<%= user.getGdriveLink() %>" target="_blank" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-box-arrow-up-right"></i> Buka
+                                        </a>
+                                    </td>
+                                </tr>
+                                <%      }
+                                    }
+                                    if (!hasGdriveLinks) { %>
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        <i class="bi bi-google display-4 d-block mb-2"></i>
+                                        Belum ada user yang memiliki link Google Drive
+                                    </td>
+                                </tr>
+                                <%    }
+                                } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -213,7 +213,7 @@
     <!-- Footer -->
     <footer class="bg-light py-3 mt-auto">
         <div class="container text-center">
-            <span class="text-muted">&copy; 2024 Examora. All rights reserved.</span>
+            <span class="text-muted">&copy; 2026 Examora. All rights reserved.</span>
         </div>
     </footer>
 

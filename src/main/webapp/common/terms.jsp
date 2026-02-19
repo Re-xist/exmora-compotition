@@ -32,7 +32,7 @@
                         </h1>
 
                         <p class="text-muted mb-4">
-                            <small>Terakhir diperbarui: Februari 2024</small>
+                            <small>Terakhir diperbarui: Februari 2026</small>
                         </p>
 
                         <div class="terms-content">
@@ -152,7 +152,7 @@
                 <!-- Footer -->
                 <div class="text-center mt-4">
                     <p class="text-muted mb-0">
-                        <small>&copy; 2024 Examora - IDS Cyber Security Academy. All rights reserved.</small>
+                        <small>&copy; 2026 Examora - IDS Cyber Security Academy. All rights reserved.</small>
                     </p>
                 </div>
             </div>

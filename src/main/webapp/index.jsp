@@ -15,11 +15,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Examora - Secure Assessment Platform</title>
-    <meta name="description" content="Official Secure Assessment Platform by IDS Cyber Security Academy">
+    <meta name="description" content="Platform Ujian Online dengan Fitur Lengkap - Quiz, Arena, Statistik, dan Integrasi Google Drive">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+    <style>
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        }
+        .arena-gradient {
+            background: linear-gradient(135deg, #fd7e14 0%, #dc3545 100%);
+        }
+    </style>
 </head>
 <body class="landing-page">
     <!-- Navigation -->
@@ -35,6 +51,9 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="#features">Fitur</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#arena">Arena</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#about">Tentang</a>
@@ -65,14 +84,42 @@
                         <span class="d-block text-warning">Secure Assessment Platform</span>
                     </h1>
                     <p class="lead text-white-50 mb-4">
-                        Platform ujian dan sistem evaluasi resmi untuk mengukur, memvalidasi,
-                        dan mendokumentasikan kompetensi peserta secara terstruktur.
+                        Platform ujian online lengkap dengan sistem quiz interaktif,
+                        Arena kompetisi real-time, statistik performa, dan integrasi Google Drive
+                        untuk pengumpulan tugas dan feedback mentor.
                     </p>
-                    <p class="text-white-50 mb-4">
-                        Examora dirancang sebagai <strong>Secure Online Assessment System</strong>
-                        yang memastikan setiap peserta memahami konsep keamanan siber sebelum
-                        melanjutkan ke tahap praktik dan eksploitasi di lab.
-                    </p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white">
+                                <i class="bi bi-journal-text fs-4 me-2"></i>
+                                <span>Quiz Online</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white">
+                                <i class="bi bi-trophy fs-4 me-2"></i>
+                                <span>Arena Live</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white">
+                                <i class="bi bi-google fs-4 me-2"></i>
+                                <span>Google Drive</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white">
+                                <i class="bi bi-graph-up fs-4 me-2"></i>
+                                <span>Statistik</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex align-items-center text-white">
+                                <i class="bi bi-check2-square fs-4 me-2"></i>
+                                <span>Absensi</span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="d-flex gap-3">
                         <a href="RegisterServlet" class="btn btn-warning btn-lg px-4">
                             <i class="bi bi-rocket-takeoff me-2"></i>Mulai Sekarang
@@ -95,90 +142,305 @@
     <section id="features" class="py-5 bg-light">
         <div class="container py-5">
             <div class="text-center mb-5">
-                <h2 class="display-6 fw-bold">Fitur Unggulan</h2>
-                <p class="text-muted">Secure Assessment System dengan fitur lengkap</p>
+                <h2 class="display-6 fw-bold">Fitur Lengkap</h2>
+                <p class="text-muted">Semua yang Anda butuhkan untuk sistem ujian online</p>
             </div>
             <div class="row g-4">
-                <div class="col-md-4">
+                <!-- Quiz Management -->
+                <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-primary text-white rounded-circle mb-3 mx-auto">
-                                <i class="bi bi-bullseye"></i>
+                        <div class="card-body p-4">
+                            <div class="feature-icon bg-primary text-white rounded-circle mb-3">
+                                <i class="bi bi-journal-text"></i>
                             </div>
-                            <h5 class="card-title">Validasi Kompetensi</h5>
+                            <h5 class="card-title">Manajemen Quiz</h5>
                             <p class="card-text text-muted">
-                                Memastikan peserta memahami konsep keamanan siber, OWASP Top 10,
-                                dan metodologi penetration testing.
+                                Buat dan kelola quiz dengan berbagai jenis soal, atur durasi,
+                                deadline, dan publish ke peserta dengan mudah.
                             </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Multiple choice questions</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Timer & auto-submit</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Deadline per quiz</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+
+                <!-- Arena Mode -->
+                <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-success text-white rounded-circle mb-3 mx-auto">
-                                <i class="bi bi-shield-check"></i>
+                        <div class="card-body p-4">
+                            <div class="feature-icon arena-gradient text-white rounded-circle mb-3">
+                                <i class="bi bi-trophy"></i>
                             </div>
-                            <h5 class="card-title">Secure Assessment</h5>
+                            <h5 class="card-title">Arena Live</h5>
                             <p class="card-text text-muted">
-                                Timed exam system, session validation, single submit enforcement,
-                                dan secure database handling.
+                                Mode kompetisi real-time! Host membuat room, peserta bergabung
+                                dengan kode, dan bermain bersama-sama.
                             </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Real-time leaderboard</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Kode room unik</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Live scoring</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+
+                <!-- Google Drive Integration -->
+                <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-info text-white rounded-circle mb-3 mx-auto">
-                                <i class="bi bi-stopwatch"></i>
+                        <div class="card-body p-4">
+                            <div class="feature-icon bg-danger text-white rounded-circle mb-3">
+                                <i class="bi bi-google"></i>
                             </div>
-                            <h5 class="card-title">Timer & Deadline</h5>
+                            <h5 class="card-title">Integrasi Google Drive</h5>
                             <p class="card-text text-muted">
-                                Timer countdown dengan auto-submit dan deadline quiz
-                                dengan format waktu WIB (Jakarta).
+                                Setiap peserta memiliki link Google Drive pribadi untuk
+                                mengumpulkan tugas dan menerima feedback dari mentor.
                             </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Folder personal</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Pengumpulan tugas</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Feedback mentor</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+
+                <!-- Statistics -->
+                <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-warning text-white rounded-circle mb-3 mx-auto">
+                        <div class="card-body p-4">
+                            <div class="feature-icon bg-success text-white rounded-circle mb-3">
                                 <i class="bi bi-graph-up"></i>
                             </div>
-                            <h5 class="card-title">Monitoring Progres</h5>
+                            <h5 class="card-title">Statistik & Analitik</h5>
                             <p class="card-text text-muted">
-                                Melihat performa peserta, menganalisis kelemahan materi,
-                                dan membuat laporan akademik terpusat.
+                                Pantau performa peserta dengan visualisasi data lengkap,
+                                distribusi nilai, dan analisis per soal.
                             </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Distribusi nilai</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Pass rate analysis</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Export ke PDF</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+
+                <!-- User Management -->
+                <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-danger text-white rounded-circle mb-3 mx-auto">
+                        <div class="card-body p-4">
+                            <div class="feature-icon bg-info text-white rounded-circle mb-3">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <h5 class="card-title">Manajemen User</h5>
+                            <p class="card-text text-muted">
+                                Kelola peserta dengan sistem tag/kelompok, import CSV
+                                untuk pendaftaran massal, dan pengaturan role.
+                            </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Import CSV bulk</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Tag & grouping</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Multi-role system</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam History -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="feature-icon bg-warning text-white rounded-circle mb-3">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <h5 class="card-title">Riwayat Ujian</h5>
+                            <p class="card-text text-muted">
+                                Peserta dapat melihat semua riwayat pengerjaan quiz,
+                                nilai yang diperoleh, dan review jawaban.
+                            </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>History lengkap</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Review jawaban</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Detail skor</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auto Grading -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="feature-icon bg-secondary text-white rounded-circle mb-3">
                                 <i class="bi bi-clipboard-check"></i>
                             </div>
                             <h5 class="card-title">Auto Grading</h5>
                             <p class="card-text text-muted">
-                                Koreksi otomatis dengan perhitungan skor real-time dan
-                                hasil yang akurat.
+                                Koreksi otomatis dengan perhitungan skor real-time,
+                                hasil akurat, dan feedback instan untuk peserta.
                             </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Scoring instan</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Hasil akurat</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Feedback langsung</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+
+                <!-- Secure System -->
+                <div class="col-md-6 col-lg-4">
                     <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon bg-secondary text-white rounded-circle mb-3 mx-auto">
-                                <i class="bi bi-people"></i>
+                        <div class="card-body p-4">
+                            <div class="feature-icon bg-dark text-white rounded-circle mb-3">
+                                <i class="bi bi-shield-lock"></i>
                             </div>
-                            <h5 class="card-title">Multi-Role System</h5>
+                            <h5 class="card-title">Secure Assessment</h5>
                             <p class="card-text text-muted">
-                                Sistem role admin dan peserta dengan akses dan fitur yang berbeda.
+                                Sistem keamanan terintegrasi dengan session validation,
+                                prevent cheating, dan secure data handling.
                             </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Session validation</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Prevent cheating</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Secure database</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Management -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="feature-icon bg-purple text-white rounded-circle mb-3" style="background-color: #6f42c1;">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <h5 class="card-title">Profil & Foto</h5>
+                            <p class="card-text text-muted">
+                                Peserta dapat mengelola profil, mengganti foto,
+                                dan mengupdate password dengan mudah.
+                            </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Upload foto profil</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Change password</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Edit profil</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance System -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="feature-icon text-white rounded-circle mb-3" style="background-color: #20c997;">
+                                <i class="bi bi-check2-square"></i>
+                            </div>
+                            <h5 class="card-title">Sistem Absensi</h5>
+                            <p class="card-text text-muted">
+                                Kelola kehadiran peserta dengan kode unik, jadwal sesi,
+                                dan export rekap kehadiran ke PDF/CSV.
+                            </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Kode absensi unik</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Export PDF/CSV</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Target per tag</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Arena Section -->
+    <section id="arena" class="py-5 arena-gradient">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6 text-white">
+                    <span class="badge bg-light text-dark mb-3">Fitur Unggulan</span>
+                    <h2 class="display-5 fw-bold mb-4">
+                        <i class="bi bi-trophy me-2"></i>Arena Mode
+                    </h2>
+                    <p class="lead mb-4">
+                        Rasakan sensasi kompetisi quiz secara real-time!
+                        Arena Mode mengubah ujian menjadi pengalaman yang menyenangkan dan interaktif.
+                    </p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="bg-white bg-opacity-10 rounded p-3">
+                                <i class="bi bi-people fs-2 d-block mb-2"></i>
+                                <strong>Multiplayer</strong>
+                                <p class="small mb-0">Banyak peserta sekaligus</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-white bg-opacity-10 rounded p-3">
+                                <i class="bi bi-bar-chart fs-2 d-block mb-2"></i>
+                                <strong>Leaderboard</strong>
+                                <p class="small mb-0">Real-time scoring</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-white bg-opacity-10 rounded p-3">
+                                <i class="bi bi-key fs-2 d-block mb-2"></i>
+                                <strong>Kode Room</strong>
+                                <p class="small mb-0">Gabung dengan kode unik</p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="bg-white bg-opacity-10 rounded p-3">
+                                <i class="bi bi-stopwatch fs-2 d-block mb-2"></i>
+                                <strong>Timer</strong>
+                                <p class="small mb-0">Waktu per soal</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-lg">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0"><i class="bi bi-trophy text-warning me-2"></i>Cara Kerja Arena</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex mb-3">
+                                <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center me-3"
+                                     style="width: 40px; height: 40px; font-weight: bold;">1</div>
+                                <div>
+                                    <h6 class="mb-1">Host Membuat Arena</h6>
+                                    <p class="text-muted small mb-0">Admin membuat room arena dan mendapatkan kode unik</p>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center me-3"
+                                     style="width: 40px; height: 40px; font-weight: bold;">2</div>
+                                <div>
+                                    <h6 class="mb-1">Peserta Bergabung</h6>
+                                    <p class="text-muted small mb-0">Masukkan kode arena untuk bergabung ke lobby</p>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center me-3"
+                                     style="width: 40px; height: 40px; font-weight: bold;">3</div>
+                                <div>
+                                    <h6 class="mb-1">Kompetisi Dimulai</h6>
+                                    <p class="text-muted small mb-0">Jawab soal secepat mungkin untuk poin tinggi</p>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <div class="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center me-3"
+                                     style="width: 40px; height: 40px; font-weight: bold;">4</div>
+                                <div>
+                                    <h6 class="mb-1">Lihat Hasil</h6>
+                                    <p class="text-muted small mb-0">Leaderboard real-time dan hasil akhir</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -193,13 +455,13 @@
                 <div class="col-lg-6">
                     <h2 class="display-6 fw-bold mb-4">Posisi dalam Ekosistem IDS</h2>
                     <p class="lead text-muted mb-4">
-                        Examora berfungsi sebagai <strong>validation layer</strong> antara
-                        teori dan praktik dalam struktur pembelajaran IDS.
+                        Examora berfungsi sebagai <strong>platform asesmen teori</strong> dimana peserta
+                        mengerjakan soal quiz untuk mendapatkan nilai dari pengyelenggara.
                     </p>
                     <div class="card bg-light border-0 mb-4">
                         <div class="card-body">
                             <code class="text-primary">
-                                Materi &rarr; <strong>Examora</strong> &rarr; Lab/CTF &rarr; Final Assessment &rarr; Certification
+                                Materi &rarr; <strong>Examora (Quiz Teori + Nilai)</strong> &rarr; Lab/CTF &rarr; Final Assessment &rarr; Certification
                             </code>
                         </div>
                     </div>
@@ -228,7 +490,8 @@
                         <div class="card-body p-5">
                             <h4 class="mb-4">Mulai Sekarang</h4>
                             <p class="text-muted mb-4">
-                                Masuk ke akun Anda untuk mulai mengerjakan quiz atau mengelola ujian.
+                                Masuk ke akun Anda untuk mulai mengerjakan quiz,
+                                bergabung ke Arena, atau mengelola sistem.
                             </p>
                             <a href="LoginServlet" class="btn btn-primary w-100">
                                 <i class="bi bi-box-arrow-in-right me-2"></i>Login Sekarang
@@ -251,7 +514,7 @@
                 <div class="col-md-6">
                     <h5><i class="bi bi-journal-check me-2"></i>Examora</h5>
                     <p class="text-muted mb-1">
-                        Official Secure Assessment Platform
+                        Platform Ujian Online dengan fitur lengkap: Quiz, Arena, Statistik, dan Google Drive
                     </p>
                     <p class="text-muted mb-0">
                         <small>IDS Cyber Security Academy</small>
@@ -262,7 +525,7 @@
                         <small>Developer: <a href="https://github.com/Re-xist" class="text-warning">Re-xist</a></small>
                     </p>
                     <p class="mb-0 text-muted">
-                        &copy; 2024 Examora. All rights reserved.
+                        &copy; 2026 Examora. All rights reserved.
                     </p>
                 </div>
             </div>

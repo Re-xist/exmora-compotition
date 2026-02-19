@@ -53,10 +53,22 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="../AttendanceServlet?action=view">
+                            <i class="bi bi-check2-square me-1"></i>Absensi
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="../ExamServlet?action=history">
                             <i class="bi bi-clock-history me-1"></i>Riwayat
                         </a>
                     </li>
+                    <% if (currentUser.getGdriveLink() != null && !currentUser.getGdriveLink().isEmpty()) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#gdriveModal">
+                            <i class="bi bi-google me-1"></i>Google Drive
+                        </a>
+                    </li>
+                    <% } %>
                 </ul>
                 <div class="d-flex align-items-center">
                     <span class="text-white me-3">
@@ -164,7 +176,7 @@
 
     <footer class="bg-light py-3 mt-auto">
         <div class="container text-center">
-            <span class="text-muted">&copy; 2024 Examora. All rights reserved.</span>
+            <span class="text-muted">&copy; 2026 Examora. All rights reserved.</span>
         </div>
     </footer>
 
@@ -238,5 +250,53 @@
             modal.show();
         }
     </script>
+
+    <!-- Google Drive Modal -->
+    <% if (currentUser.getGdriveLink() != null && !currentUser.getGdriveLink().isEmpty()) { %>
+    <div class="modal fade" id="gdriveModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white border-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-google me-2"></i>Google Drive - Pengumpulan Tugas
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-4">
+                        <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                             style="width: 80px; height: 80px;">
+                            <i class="bi bi-folder2-open text-danger" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h5 class="mb-3">Folder Pengumpulan Tugas & Feedback</h5>
+                    <p class="text-muted mb-4">
+                        Ini adalah folder Google Drive pribadi Anda untuk:
+                    </p>
+                    <div class="text-start bg-light p-3 rounded mb-4">
+                        <ul class="mb-0">
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Mengumpulkan tugas dan assignment</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Menerima feedback dari mentor</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Melihat hasil review dan nilai</li>
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Dokumen pembelajaran lainnya</li>
+                        </ul>
+                    </div>
+                    <div class="alert alert-info text-start mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Catatan:</strong> Pastikan Anda sudah login dengan akun Google yang terdaftar untuk mengakses folder ini.
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i>Tutup
+                    </button>
+                    <a href="<%= currentUser.getGdriveLink() %>" target="_blank" class="btn btn-danger px-4">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>Buka Google Drive
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% } %>
 </body>
 </html>

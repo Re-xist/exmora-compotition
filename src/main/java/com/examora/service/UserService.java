@@ -31,6 +31,13 @@ public class UserService {
      * Register a new user with tag
      */
     public User register(String name, String email, String password, String role, String tag) throws ServiceException {
+        return register(name, email, password, role, tag, null);
+    }
+
+    /**
+     * Register a new user with tag and gdrive link
+     */
+    public User register(String name, String email, String password, String role, String tag, String gdriveLink) throws ServiceException {
         // Validate inputs
         if (!ValidationUtil.isValidName(name)) {
             throw new ServiceException("Nama tidak valid");
@@ -53,6 +60,7 @@ public class UserService {
 
             // Create user
             User user = new User(name, email, hashedPassword, role != null ? role : "peserta", tag);
+            user.setGdriveLink(gdriveLink);
             return userDAO.create(user);
 
         } catch (SQLException e) {
@@ -230,6 +238,13 @@ public class UserService {
      * Update user profile with tag
      */
     public void updateUserProfile(Integer id, String name, String email, String role, String tag) throws ServiceException {
+        updateUserProfile(id, name, email, role, tag, null);
+    }
+
+    /**
+     * Update user profile with tag and gdrive link
+     */
+    public void updateUserProfile(Integer id, String name, String email, String role, String tag, String gdriveLink) throws ServiceException {
         if (!ValidationUtil.isValidName(name)) {
             throw new ServiceException("Nama tidak valid");
         }
@@ -255,6 +270,7 @@ public class UserService {
                 user.setRole(role);
             }
             user.setTag(tag);
+            user.setGdriveLink(gdriveLink);
             userDAO.update(user);
 
         } catch (SQLException e) {

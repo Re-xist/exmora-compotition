@@ -1,6 +1,7 @@
 package com.examora.controller;
 
 import com.examora.model.User;
+import com.examora.service.AttendanceService;
 import com.examora.service.QuizService;
 import com.examora.service.SubmissionService;
 import com.examora.service.UserService;
@@ -30,12 +31,14 @@ public class AdminServlet extends HttpServlet {
     private UserService userService;
     private QuizService quizService;
     private SubmissionService submissionService;
+    private AttendanceService attendanceService;
 
     @Override
     public void init() throws ServletException {
         userService = new UserService();
         quizService = new QuizService();
         submissionService = new SubmissionService();
+        attendanceService = new AttendanceService();
     }
 
     @Override
@@ -131,6 +134,7 @@ public class AdminServlet extends HttpServlet {
             String password = request.getParameter("password");
             String role = request.getParameter("role");
             String tag = request.getParameter("tag");
+            String gdriveLink = request.getParameter("gdriveLink");
 
             if (name == null || name.trim().isEmpty()) {
                 request.setAttribute("error", "Nama tidak boleh kosong");
@@ -148,7 +152,7 @@ public class AdminServlet extends HttpServlet {
                 return;
             }
 
-            userService.register(name.trim(), email.trim(), password, role != null ? role : "peserta", tag);
+            userService.register(name.trim(), email.trim(), password, role != null ? role : "peserta", tag, gdriveLink);
             request.setAttribute("success", "User berhasil dibuat");
             listUsers(request, response);
 
@@ -166,6 +170,7 @@ public class AdminServlet extends HttpServlet {
             String email = request.getParameter("email");
             String role = request.getParameter("role");
             String tag = request.getParameter("tag");
+            String gdriveLink = request.getParameter("gdriveLink");
 
             if (userIdStr == null || userIdStr.isEmpty()) {
                 request.setAttribute("error", "User ID tidak valid");
@@ -175,8 +180,8 @@ public class AdminServlet extends HttpServlet {
 
             Integer userId = Integer.parseInt(userIdStr);
 
-            // Update user profile with tag
-            userService.updateUserProfile(userId, name, email, role, tag);
+            // Update user profile with tag and gdrive link
+            userService.updateUserProfile(userId, name, email, role, tag, gdriveLink);
 
             request.setAttribute("success", "User berhasil diupdate");
             listUsers(request, response);
@@ -231,10 +236,28 @@ public class AdminServlet extends HttpServlet {
             List<?> quizzes = quizService.getAllQuizzes();
             List<?> submissions = submissionService.getAllSubmissions();
 
+            // Attendance statistics
+            int totalAttendanceSessions = 0;
+            int activeAttendanceSessions = 0;
+            try {
+                List<?> attendanceSessions = attendanceService.getAllSessions();
+                totalAttendanceSessions = attendanceSessions.size();
+                for (Object obj : attendanceSessions) {
+                    com.examora.model.AttendanceSession session = (com.examora.model.AttendanceSession) obj;
+                    if ("active".equals(session.getStatus())) {
+                        activeAttendanceSessions++;
+                    }
+                }
+            } catch (Exception e) {
+                // Ignore attendance errors
+            }
+
             request.setAttribute("totalUsers", totalUsers);
             request.setAttribute("totalAdmins", totalAdmins);
             request.setAttribute("totalQuizzes", quizzes.size());
             request.setAttribute("totalSubmissions", submissions.size());
+            request.setAttribute("totalAttendanceSessions", totalAttendanceSessions);
+            request.setAttribute("activeAttendanceSessions", activeAttendanceSessions);
             request.setAttribute("quizzes", quizzes);
             request.setAttribute("submissions", submissions);
 
@@ -283,21 +306,31 @@ public class AdminServlet extends HttpServlet {
             Integer quizId = quizIdStr != null && !quizIdStr.isEmpty() ?
                     Integer.parseInt(quizIdStr) : null;
 
-            if (quizId != null) {
-                Map<String, Object> stats = submissionService.getQuizStatistics(quizId);
-                request.setAttribute("statistics", stats);
-                request.setAttribute("selectedQuizId", quizId);
+            // Always load quizzes for the dropdown
+            request.setAttribute("quizzes", quizService.getAllQuizzes());
 
-                // Get detailed submissions list
-                List<Map<String, Object>> submissions = submissionService.getDetailedQuizResults(quizId);
-                request.setAttribute("submissions", submissions);
+            if (quizId != null) {
+                try {
+                    Map<String, Object> stats = submissionService.getQuizStatistics(quizId);
+                    request.setAttribute("statistics", stats);
+                    request.setAttribute("selectedQuizId", quizId);
+
+                    // Get detailed submissions list
+                    List<Map<String, Object>> submissions = submissionService.getDetailedQuizResults(quizId);
+                    request.setAttribute("submissions", submissions);
+                } catch (Exception e) {
+                    // Log the error but still show the page with an error message
+                    e.printStackTrace();
+                    request.setAttribute("error", "Gagal memuat statistik: " + e.getMessage());
+                }
             }
 
-            request.setAttribute("quizzes", quizService.getAllQuizzes());
             request.getRequestDispatcher("/admin/statistics.jsp").forward(request, response);
 
         } catch (Exception e) {
-            throw new ServletException("Error loading statistics", e);
+            e.printStackTrace();
+            request.setAttribute("error", "Error loading statistics: " + e.getMessage());
+            request.getRequestDispatcher("/admin/statistics.jsp").forward(request, response);
         }
     }
 

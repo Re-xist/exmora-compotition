@@ -296,9 +296,11 @@ public class SubmissionService {
             // Update unanswered count for each submission
             for (Map<String, Object> sub : submissions) {
                 Integer submissionId = (Integer) sub.get("id");
+                if (submissionId == null) continue;
+
                 int answeredCount = submissionDAO.getAnsweredCount(submissionId);
-                int totalQuestions = (Integer) sub.get("totalQuestions");
-                int correctAnswers = (Integer) sub.get("correctAnswers");
+                int totalQuestions = sub.get("totalQuestions") != null ? (Integer) sub.get("totalQuestions") : 0;
+                int correctAnswers = sub.get("correctAnswers") != null ? (Integer) sub.get("correctAnswers") : 0;
                 int wrongCount = answeredCount - correctAnswers;
                 int unanswered = totalQuestions - answeredCount;
 

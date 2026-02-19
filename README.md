@@ -12,62 +12,89 @@
 
 ## Apa Itu Examora?
 
-Examora adalah platform ujian dan sistem evaluasi resmi yang digunakan dalam program **IDS Cyber Security Academy** untuk mengukur, memvalidasi, dan mendokumentasikan kompetensi peserta secara terstruktur.
+Examora adalah platform ujian online lengkap yang digunakan dalam program **IDS Cyber Security Academy** untuk mengukur, memvalidasi, dan mendokumentasikan kompetensi peserta secara terstruktur melalui sistem quiz teori.
 
-Examora dirancang sebagai **Secure Online Assessment System** yang memastikan setiap peserta benar-benar memahami konsep keamanan siber sebelum melanjutkan ke tahap praktik dan eksploitasi di lab.
-
-Platform ini bukan sekadar sistem quiz biasa, melainkan bagian dari arsitektur akademik yang terintegrasi dengan:
-- Kurikulum pembelajaran
-- Lab praktik dan CTF
-- Sistem pelaporan akademik
-- Standarisasi kelulusan
+Platform ini dilengkapi dengan fitur **Quiz Online**, **Arena Mode** (kompetisi real-time), **Sistem Absensi**, **Integrasi Google Drive** untuk pengumpulan tugas dan feedback mentor, serta **Statistik & Analitik** lengkap.
 
 ---
 
-## Fungsi Utama Examora
+## Fitur Utama
 
-### Validasi Kompetensi
+### 1. Manajemen Quiz
+- Buat dan kelola quiz dengan multiple choice questions
+- Atur durasi dan timer countdown dengan auto-submit
+- Set deadline per quiz dengan timezone WIB
+- Publish/unpublish quiz ke peserta
+- Support gambar pada soal dan opsi jawaban
 
-Examora digunakan untuk memastikan bahwa peserta memahami:
-- Konsep dasar cybersecurity
-- Logic serangan (SQLi, XSS, SSRF, dll)
-- Authentication & session security
-- OWASP Top 10
-- Metodologi penetration testing
+### 2. Arena Mode (Real-time Competition)
+- Mode kompetisi quiz secara real-time
+- Host membuat room dengan kode unik
+- Peserta bergabung dengan kode arena
+- Real-time leaderboard dan live scoring
+- Timer per soal untuk keseruan maksimal
 
-### Platform Ujian Resmi
+### 3. Sistem Absensi
+- Admin membuat sesi absensi dengan kode unik 6 karakter
+- Peserta input kode untuk melakukan absensi
+- Target absensi per tag/kelompok
+- Jadwal sesi dengan waktu mulai dan selesai
+- Deteksi terlambat otomatis dengan threshold yang dapat dikustomisasi
+- Export rekap kehadiran ke PDF dan CSV
+- Riwayat absensi peserta
 
-- Quiz mingguan
-- Ujian tengah program
-- Final exam
-- Pre-test & post-test
-- Assessment sebelum akses lab tertentu
+### 4. Integrasi Google Drive
+- Setiap peserta memiliki link Google Drive pribadi
+- Untuk pengumpulan tugas dan assignment
+- Menerima feedback dari mentor
+- Dokumen pembelajaran dan hasil review
 
-### Monitoring & Tracking Progres
+### 5. Statistik & Analitik
+- Distribusi nilai visual (chart)
+- Pass rate analysis
+- Detail hasil per peserta
+- Export hasil ke PDF
+- Analisis performa per soal
 
-- Melihat performa peserta
-- Menganalisis kelemahan materi
-- Mengukur tingkat kelulusan
-- Membuat laporan akademik terpusat
+### 6. Manajemen User
+- Multi-role system (Admin & Peserta)
+- Tag/kelompok untuk grouping peserta
+- Import CSV untuk pendaftaran massal
+- CRUD user lengkap dengan foto profil
 
-### Secure Assessment System
+### 7. Riwayat Ujian
+- History lengkap semua pengerjaan
+- Review jawaban dan pembahasan
+- Detail skor per quiz
+- Waktu pengerjaan tersimpan
 
-- Timed exam system
-- Randomisasi soal
-- Auto grading
+### 8. Auto Grading
+- Koreksi otomatis instan
+- Perhitungan skor real-time
+- Feedback langsung setelah submit
+- Hasil akurat dan transparan
+
+### 9. Secure Assessment
 - Session validation
+- Prevent cheating (disable context menu, text selection)
 - Single submit enforcement
 - Secure database handling
+- Password hashing (SHA-256 with salt)
+
+### 10. Profil & Settings
+- Upload foto profil
+- Ganti password
+- Edit profil peserta
 
 ---
 
 ## Posisi Examora dalam Ekosistem IDS
 
 ```
-Materi → Examora (Validasi Teori) → Lab / CTF → Final Assessment → Certification
+Materi → Examora (Quiz Teori + Nilai) → Lab / CTF → Final Assessment → Certification
 ```
 
-Examora berfungsi sebagai **validation layer** antara teori dan praktik.
+Examora berfungsi sebagai **platform asesmen teori** dimana peserta mengerjakan soal quiz untuk mendapatkan nilai dari pengyelenggara.
 
 ---
 
@@ -78,7 +105,9 @@ Examora berfungsi sebagai **validation layer** antara teori dan praktik.
 | Backend | Java 11+, JSP, Servlet |
 | Server | Apache Tomcat 10+ |
 | Database | MySQL 8.0+ / MariaDB |
-| Frontend | HTML5, CSS3, Bootstrap 5 |
+| Frontend | HTML5, CSS3, Bootstrap 5, Bootstrap Icons |
+| Charts | Chart.js |
+| Export | html2pdf.js |
 | Build Tool | Maven |
 | Container | Docker & Docker Compose |
 
@@ -175,11 +204,24 @@ Examora/
 │   │       └── WEB-INF/       # Web configuration
 │   └── test/                  # Test classes
 ├── sql/                       # Database scripts
+│   ├── schema.sql             # Main database schema
+│   ├── sample_data.sql        # Sample data
+│   └── add_*.sql              # Migration scripts
 ├── docker-compose.yml         # Docker configuration
 ├── Dockerfile                 # Docker build file
 ├── pom.xml                    # Maven configuration
 └── README.md                  # This file
 ```
+
+---
+
+## Default Accounts
+
+Setelah instalasi, Anda dapat login dengan akun default:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@examora.com | admin123 |
 
 ---
 
@@ -191,7 +233,29 @@ Examora/
 - Session management
 - Role-based access control
 - Quiz deadline validation
-- Timezone-aware timestamp handling
+- Timezone-aware timestamp handling (WIB/Jakarta)
+- CSRF protection
+
+---
+
+## Screenshot
+
+### Landing Page
+Halaman utama dengan informasi fitur lengkap
+
+### Dashboard Admin
+- Kelola Quiz
+- Kelola User dengan Import CSV
+- Kelola Arena
+- Kelola Absensi
+- Lihat Statistik
+
+### Dashboard Peserta
+- Quiz Tersedia
+- Arena Mode
+- Absensi dengan Kode Unik
+- Riwayat Ujian
+- Google Drive Integration
 
 ---
 

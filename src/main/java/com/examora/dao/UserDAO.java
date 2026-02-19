@@ -16,7 +16,7 @@ public class UserDAO {
      * Create a new user
      */
     public User create(User user) throws SQLException {
-        String sql = "INSERT INTO users (name, email, password, role, tag) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (name, email, password, role, tag, gdrive_link) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -26,6 +26,7 @@ public class UserDAO {
             stmt.setString(3, user.getPassword());
             stmt.setString(4, user.getRole());
             stmt.setString(5, user.getTag());
+            stmt.setString(6, user.getGdriveLink());
 
             int affectedRows = stmt.executeUpdate();
 
@@ -150,7 +151,7 @@ public class UserDAO {
      * Update user
      */
     public boolean update(User user) throws SQLException {
-        String sql = "UPDATE users SET name = ?, email = ?, role = ?, tag = ?, photo = ? WHERE id = ?";
+        String sql = "UPDATE users SET name = ?, email = ?, role = ?, tag = ?, photo = ?, gdrive_link = ? WHERE id = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -160,7 +161,8 @@ public class UserDAO {
             stmt.setString(3, user.getRole());
             stmt.setString(4, user.getTag());
             stmt.setString(5, user.getPhoto());
-            stmt.setInt(6, user.getId());
+            stmt.setString(6, user.getGdriveLink());
+            stmt.setInt(7, user.getId());
 
             return stmt.executeUpdate() > 0;
         }
@@ -287,6 +289,7 @@ public class UserDAO {
         user.setRole(rs.getString("role"));
         user.setTag(rs.getString("tag"));
         user.setPhoto(rs.getString("photo"));
+        user.setGdriveLink(rs.getString("gdrive_link"));
         user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         user.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
         return user;

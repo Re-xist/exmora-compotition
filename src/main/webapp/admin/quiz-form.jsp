@@ -64,6 +64,7 @@
             <li><a href="../QuizServlet?action=list" class="active"><i class="bi bi-journal-text"></i>Kelola Quiz</a></li>
             <li><a href="../ArenaServlet?action=list"><i class="bi bi-trophy"></i>Kelola Arena</a></li>
             <li><a href="../AdminServlet?action=users"><i class="bi bi-people"></i>Kelola User</a></li>
+            <li><a href="../AttendanceServlet?action=list"><i class="bi bi-check2-square"></i>Absensi</a></li>
             <li><a href="../AdminServlet?action=statistics"><i class="bi bi-graph-up"></i>Statistik</a></li>
             <li><a href="../SettingsServlet"><i class="bi bi-gear"></i>Pengaturan</a></li>
             <li class="mt-5"><a href="../LogoutServlet"><i class="bi bi-box-arrow-left"></i>Logout</a></li>

@@ -7,6 +7,7 @@ import com.examora.model.Submission;
 import com.examora.model.User;
 import com.examora.service.QuizService;
 import com.examora.service.SubmissionService;
+import com.examora.service.UserService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,11 +26,13 @@ import java.util.Map;
 public class ExamServlet extends HttpServlet {
     private QuizService quizService;
     private SubmissionService submissionService;
+    private UserService userService;
 
     @Override
     public void init() throws ServletException {
         quizService = new QuizService();
         submissionService = new SubmissionService();
+        userService = new UserService();
     }
 
     @Override
@@ -93,8 +96,13 @@ public class ExamServlet extends HttpServlet {
     }
 
     private void listAvailableQuizzes(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, QuizService.ServiceException, SubmissionService.ServiceException {
-        User user = (User) request.getSession().getAttribute("user");
+            throws ServletException, IOException, QuizService.ServiceException, SubmissionService.ServiceException, UserService.ServiceException {
+        User sessionUser = (User) request.getSession().getAttribute("user");
+
+        // Refresh user data from database to get latest gdrive_link
+        User user = userService.getUserById(sessionUser.getId());
+        request.getSession().setAttribute("user", user);
+
         // Get quizzes filtered by user's tag
         List<Quiz> quizzes = quizService.getActiveQuizzesByTag(user.getTag());
 
@@ -112,8 +120,13 @@ public class ExamServlet extends HttpServlet {
     }
 
     private void showUserDashboard(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, QuizService.ServiceException, SubmissionService.ServiceException {
-        User user = (User) request.getSession().getAttribute("user");
+            throws ServletException, IOException, QuizService.ServiceException, SubmissionService.ServiceException, UserService.ServiceException {
+        User sessionUser = (User) request.getSession().getAttribute("user");
+
+        // Refresh user data from database to get latest gdrive_link
+        User user = userService.getUserById(sessionUser.getId());
+        request.getSession().setAttribute("user", user);
+
         // Get quizzes filtered by user's tag
         List<Quiz> quizzes = quizService.getActiveQuizzesByTag(user.getTag());
 
@@ -158,7 +171,7 @@ public class ExamServlet extends HttpServlet {
     }
 
     private void showExam(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, QuizService.ServiceException, SubmissionService.ServiceException {
+            throws ServletException, IOException, QuizService.ServiceException, SubmissionService.ServiceException, UserService.ServiceException {
         String quizIdStr = request.getParameter("quizId");
         if (quizIdStr == null || quizIdStr.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/ExamServlet?action=list");
@@ -337,8 +350,13 @@ public class ExamServlet extends HttpServlet {
     }
 
     private void showHistory(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SubmissionService.ServiceException {
-        User user = (User) request.getSession().getAttribute("user");
+            throws ServletException, IOException, SubmissionService.ServiceException, UserService.ServiceException {
+        User sessionUser = (User) request.getSession().getAttribute("user");
+
+        // Refresh user data from database to get latest gdrive_link
+        User user = userService.getUserById(sessionUser.getId());
+        request.getSession().setAttribute("user", user);
+
         List<Submission> submissions = submissionService.getUserSubmissions(user.getId());
 
         request.setAttribute("submissions", submissions);

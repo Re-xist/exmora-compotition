@@ -13,6 +13,7 @@ public class User {
     private String role;
     private String tag; // Tag/kelompok user (contoh: Kelas A, Divisi IT, dll)
     private String photo; // Profile photo path
+    private String gdriveLink; // Google Drive link
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -89,6 +90,14 @@ public class User {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public String getGdriveLink() {
+        return gdriveLink;
+    }
+
+    public void setGdriveLink(String gdriveLink) {
+        this.gdriveLink = gdriveLink;
     }
 
     public LocalDateTime getCreatedAt() {

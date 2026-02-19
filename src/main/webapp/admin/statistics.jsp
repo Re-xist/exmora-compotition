@@ -90,6 +90,7 @@
             <li><a href="../QuizServlet?action=list"><i class="bi bi-journal-text"></i>Kelola Quiz</a></li>
             <li><a href="../ArenaServlet?action=list"><i class="bi bi-trophy"></i>Kelola Arena</a></li>
             <li><a href="../AdminServlet?action=users"><i class="bi bi-people"></i>Kelola User</a></li>
+            <li><a href="../AttendanceServlet?action=list"><i class="bi bi-check2-square"></i>Absensi</a></li>
             <li><a href="../AdminServlet?action=statistics" class="active"><i class="bi bi-graph-up"></i>Statistik</a></li>
             <li><a href="../SettingsServlet"><i class="bi bi-gear"></i>Pengaturan</a></li>
             <li class="mt-5"><a href="../LogoutServlet"><i class="bi bi-box-arrow-left"></i>Logout</a></li>
@@ -658,18 +659,17 @@
             }
 
             const modal = new bootstrap.Modal(document.getElementById('userDetailModal'));
-            document.getElementById('userDetailBody').innerHTML = `
-                <div class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="text-muted mt-3">Memuat data...</p>
-                </div>
-            `;
+            document.getElementById('userDetailBody').innerHTML =
+                '<div class="text-center py-5">' +
+                    '<div class="spinner-border text-primary" role="status">' +
+                        '<span class="visually-hidden">Loading...</span>' +
+                    '</div>' +
+                    '<p class="text-muted mt-3">Memuat data...</p>' +
+                '</div>';
             modal.show();
 
             // Fetch user detail
-            fetch(`../AdminServlet?action=userDetail&submissionId=${submissionId}`)
+            fetch('../AdminServlet?action=userDetail&submissionId=' + submissionId)
                 .then(response => {
                     if (!response.ok) throw new Error('Failed to load');
                     return response.text();
@@ -680,20 +680,20 @@
                     initUserChart();
                 })
                 .catch(error => {
-                    document.getElementById('userDetailBody').innerHTML = `
-                        <div id="userDetailContent">
-                            <div class="text-center py-5">
-                                <div class="mb-4">
-                                    <i class="bi bi-exclamation-triangle display-1 text-danger"></i>
-                                </div>
-                                <h4 class="text-muted mb-3">Gagal Memuat Data</h4>
-                                <p class="text-muted">${error.message}</p>
-                                <button class="btn btn-outline-primary btn-sm" onclick="loadUserDetail('${submissionId}')">
-                                    <i class="bi bi-arrow-clockwise me-1"></i>Coba Lagi
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                    var errorMsg = error.message || 'Unknown error';
+                    document.getElementById('userDetailBody').innerHTML =
+                        '<div id="userDetailContent">' +
+                            '<div class="text-center py-5">' +
+                                '<div class="mb-4">' +
+                                    '<i class="bi bi-exclamation-triangle display-1 text-danger"></i>' +
+                                '</div>' +
+                                '<h4 class="text-muted mb-3">Gagal Memuat Data</h4>' +
+                                '<p class="text-muted">' + errorMsg + '</p>' +
+                                '<button class="btn btn-outline-primary btn-sm" onclick="loadUserDetail(\'' + submissionId + '\')">' +
+                                    '<i class="bi bi-arrow-clockwise me-1"></i>Coba Lagi' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>';
                 });
         }
 
@@ -763,7 +763,7 @@
 
             const opt = {
                 margin: 10,
-                filename: `hasil_${quizTitle}_${userName}.pdf`,
+                filename: 'hasil_' + quizTitle + '_' + userName + '.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -787,13 +787,12 @@
             }
 
             const wrapper = document.createElement('div');
-            wrapper.innerHTML = `
-                <div style="padding: 20px; font-family: Arial, sans-serif;">
-                    <h2 style="text-align: center; margin-bottom: 20px;">Daftar Peserta & Nilai</h2>
-                    <p style="text-align: center; margin-bottom: 20px;">Quiz: <%= quizzes != null ? quizzes.stream().filter(q -> selectedQuizId != null && q.getId().equals(selectedQuizId)).findFirst().map(q -> q.getTitle()).orElse("") : "" %></p>
-                    ${table.outerHTML}
-                </div>
-            `;
+            wrapper.innerHTML =
+                '<div style="padding: 20px; font-family: Arial, sans-serif;">' +
+                    '<h2 style="text-align: center; margin-bottom: 20px;">Daftar Peserta & Nilai</h2>' +
+                    '<p style="text-align: center; margin-bottom: 20px;">Quiz: <%= quizzes != null ? quizzes.stream().filter(q -> selectedQuizId != null && q.getId().equals(selectedQuizId)).findFirst().map(q -> q.getTitle()).orElse("") : "" %></p>' +
+                    table.outerHTML +
+                '</div>';
 
             const opt = {
                 margin: 10,
@@ -845,7 +844,7 @@
             });
 
             // Update filtered count
-            document.getElementById('totalCount').textContent = `Ditemukan: ${filteredRows.length} peserta`;
+            document.getElementById('totalCount').textContent = 'Ditemukan: ' + filteredRows.length + ' peserta';
 
             currentPage = 1;
             renderTable();
@@ -890,7 +889,7 @@
             const startItem = filteredRows.length > 0 ? ((currentPage - 1) * pageSizeVal) + 1 : 0;
             const endItem = pageSize === 'all' ? filteredRows.length : Math.min(currentPage * pageSizeVal, filteredRows.length);
             document.getElementById('showingInfo').textContent =
-                `Menampilkan ${startItem}-${endItem} dari ${filteredRows.length} peserta`;
+                'Menampilkan ' + startItem + '-' + endItem + ' dari ' + filteredRows.length + ' peserta';
 
             // Render pagination
             renderPagination(totalPages);
@@ -904,8 +903,8 @@
 
             // Previous button
             const prevLi = document.createElement('li');
-            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-            prevLi.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage - 1}); return false;"><i class="bi bi-chevron-left"></i></a>`;
+            prevLi.className = 'page-item ' + (currentPage === 1 ? 'disabled' : '');
+            prevLi.innerHTML = '<a class="page-link" href="#" onclick="goToPage(' + (currentPage - 1) + '); return false;"><i class="bi bi-chevron-left"></i></a>';
             paginationList.appendChild(prevLi);
 
             // Page numbers
@@ -920,21 +919,21 @@
             if (startPage > 1) {
                 const li = document.createElement('li');
                 li.className = 'page-item';
-                li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(1); return false;">1</a>`;
+                li.innerHTML = '<a class="page-link" href="#" onclick="goToPage(1); return false;">1</a>';
                 paginationList.appendChild(li);
 
                 if (startPage > 2) {
                     const ellipsis = document.createElement('li');
                     ellipsis.className = 'page-item disabled';
-                    ellipsis.innerHTML = `<span class="page-link">...</span>`;
+                    ellipsis.innerHTML = '<span class="page-link">...</span>';
                     paginationList.appendChild(ellipsis);
                 }
             }
 
             for (let i = startPage; i <= endPage; i++) {
                 const li = document.createElement('li');
-                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
-                li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i}</a>`;
+                li.className = 'page-item ' + (i === currentPage ? 'active' : '');
+                li.innerHTML = '<a class="page-link" href="#" onclick="goToPage(' + i + '); return false;">' + i + '</a>';
                 paginationList.appendChild(li);
             }
 
@@ -942,20 +941,20 @@
                 if (endPage < totalPages - 1) {
                     const ellipsis = document.createElement('li');
                     ellipsis.className = 'page-item disabled';
-                    ellipsis.innerHTML = `<span class="page-link">...</span>`;
+                    ellipsis.innerHTML = '<span class="page-link">...</span>';
                     paginationList.appendChild(ellipsis);
                 }
 
                 const li = document.createElement('li');
                 li.className = 'page-item';
-                li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${totalPages}); return false;">${totalPages}</a>`;
+                li.innerHTML = '<a class="page-link" href="#" onclick="goToPage(' + totalPages + '); return false;">' + totalPages + '</a>';
                 paginationList.appendChild(li);
             }
 
             // Next button
             const nextLi = document.createElement('li');
-            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-            nextLi.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage + 1}); return false;"><i class="bi bi-chevron-right"></i></a>`;
+            nextLi.className = 'page-item ' + (currentPage === totalPages ? 'disabled' : '');
+            nextLi.innerHTML = '<a class="page-link" href="#" onclick="goToPage(' + (currentPage + 1) + '); return false;"><i class="bi bi-chevron-right"></i></a>';
             paginationList.appendChild(nextLi);
         }
 

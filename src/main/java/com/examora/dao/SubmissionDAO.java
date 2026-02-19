@@ -257,6 +257,15 @@ public class SubmissionDAO {
     public Map<String, Object> getStatistics(Integer quizId) throws SQLException {
         Map<String, Object> stats = new HashMap<>();
 
+        // Initialize default values
+        stats.put("totalSubmissions", 0);
+        stats.put("averageScore", 0.0);
+        stats.put("highestScore", 0.0);
+        stats.put("lowestScore", 0.0);
+        stats.put("averageTimeSpent", 0);
+        stats.put("minTimeSpent", 0);
+        stats.put("maxTimeSpent", 0);
+
         // Basic statistics
         String basicSql = "SELECT COUNT(*) as total, AVG(score) as avg_score, MAX(score) as max_score, MIN(score) as min_score, " +
                           "AVG(time_spent) as avg_time, MIN(time_spent) as min_time, MAX(time_spent) as max_time " +
@@ -279,6 +288,16 @@ public class SubmissionDAO {
                 }
             }
         }
+
+        // Score distribution - initialize defaults
+        stats.put("scoreRange0_40", 0);
+        stats.put("scoreRange41_60", 0);
+        stats.put("scoreRange61_75", 0);
+        stats.put("scoreRange76_85", 0);
+        stats.put("scoreRange86_100", 0);
+        stats.put("passedCount", 0);
+        stats.put("failedCount", 0);
+        stats.put("passRate", 0.0);
 
         // Score distribution
         String distSql = "SELECT " +
@@ -307,9 +326,9 @@ public class SubmissionDAO {
                     stats.put("failedCount", rs.getInt("failed"));
 
                     // Calculate pass rate
-                    int total = (int) stats.get("totalSubmissions");
+                    Integer total = (Integer) stats.get("totalSubmissions");
                     int passed = rs.getInt("passed");
-                    double passRate = total > 0 ? (passed * 100.0 / total) : 0;
+                    double passRate = (total != null && total > 0) ? (passed * 100.0 / total) : 0;
                     stats.put("passRate", passRate);
                 }
             }

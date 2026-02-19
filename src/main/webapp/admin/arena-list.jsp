@@ -53,6 +53,11 @@
                 </a>
             </li>
             <li>
+                <a href="../AttendanceServlet?action=list">
+                    <i class="bi bi-check2-square"></i>Absensi
+                </a>
+            </li>
+            <li>
                 <a href="../AdminServlet?action=statistics">
                     <i class="bi bi-graph-up"></i>Statistik
                 </a>
