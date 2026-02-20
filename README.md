@@ -14,7 +14,7 @@
 
 Examora adalah platform ujian online lengkap yang digunakan dalam program **IDS Cyber Security Academy** untuk mengukur, memvalidasi, dan mendokumentasikan kompetensi peserta secara terstruktur melalui sistem quiz teori.
 
-Platform ini dilengkapi dengan fitur **Quiz Online**, **Arena Mode** (kompetisi real-time), **Sistem Absensi**, **Integrasi Google Drive** untuk pengumpulan tugas dan feedback mentor, serta **Statistik & Analitik** lengkap.
+Platform ini dilengkapi dengan fitur **Quiz Online**, **Arena Mode** (kompetisi real-time), **Sistem Absensi**, **Bank Soal**, **Achievement System**, **Notifikasi Email**, **Integrasi Google Drive**, serta **Statistik & Analitik** lengkap dengan keamanan tingkat enterprise.
 
 ---
 
@@ -26,15 +26,23 @@ Platform ini dilengkapi dengan fitur **Quiz Online**, **Arena Mode** (kompetisi 
 - Set deadline per quiz dengan timezone WIB
 - Publish/unpublish quiz ke peserta
 - Support gambar pada soal dan opsi jawaban
+- Target quiz berdasarkan tag/kelompok peserta
 
-### 2. Arena Mode (Real-time Competition)
+### 2. Bank Soal (Question Bank)
+- Simpan dan kelola pool pertanyaan untuk digunakan ulang
+- Kategorisasi soal berdasarkan topik (Networking, Programming, dll)
+- Pilih soal dari bank saat membuat quiz
+- Efisiensi pembuatan quiz dengan reuse soal
+- Pencarian dan filter soal berdasarkan kategori
+
+### 3. Arena Mode (Real-time Competition)
 - Mode kompetisi quiz secara real-time
 - Host membuat room dengan kode unik
 - Peserta bergabung dengan kode arena
 - Real-time leaderboard dan live scoring
 - Timer per soal untuk keseruan maksimal
 
-### 3. Sistem Absensi
+### 4. Sistem Absensi
 - Admin membuat sesi absensi dengan kode unik 6 karakter
 - Peserta input kode untuk melakukan absensi
 - Target absensi per tag/kelompok
@@ -43,43 +51,75 @@ Platform ini dilengkapi dengan fitur **Quiz Online**, **Arena Mode** (kompetisi 
 - Export rekap kehadiran ke PDF dan CSV
 - Riwayat absensi peserta
 
-### 4. Integrasi Google Drive
+### 5. Achievement & Gamification
+- Sistem badge untuk meningkatkan engagement peserta
+- Achievement berdasarkan score, kecepatan, dan jumlah quiz
+- Poin dan leaderboard
+- Kategori: Perfect Score, Quick Thinker, Quiz Master, dll
+- Visual badge dengan icon dan warna kustom
+
+### 6. Notifikasi Email
+- Template email yang dapat dikustomisasi
+- Notifikasi quiz baru untuk peserta
+- Pengingat deadline quiz
+- Notifikasi hasil quiz
+- Antrian email dengan status tracking
+
+### 7. Audit Log
+- Tracking semua aktivitas admin
+- Log login/logout user
+- Log CRUD operasi (create, update, delete)
+- Filter berdasarkan action type, entity, status
+- Detail dengan IP address dan user agent
+
+### 8. Integrasi Google Drive
 - Setiap peserta memiliki link Google Drive pribadi
 - Untuk pengumpulan tugas dan assignment
 - Menerima feedback dari mentor
 - Dokumen pembelajaran dan hasil review
 
-### 5. Statistik & Analitik
+### 9. Statistik & Analitik
 - Distribusi nilai visual (chart)
 - Pass rate analysis
 - Detail hasil per peserta
 - Export hasil ke PDF
 - Analisis performa per soal
 
-### 6. Manajemen User
+### 10. Manajemen User
 - Multi-role system (Admin & Peserta)
 - Tag/kelompok untuk grouping peserta
 - Import CSV untuk pendaftaran massal
 - CRUD user lengkap dengan foto profil
 
-### 7. Riwayat Ujian
+### 11. Riwayat Ujian
 - History lengkap semua pengerjaan
 - Review jawaban dengan teks pilihan jawaban
 - Detail skor per quiz
 - Waktu pengerjaan tersimpan
 
-### 8. Auto Grading
+### 12. Auto Grading
 - Koreksi otomatis instan
 - Perhitungan skor real-time
 - Feedback langsung setelah submit
 - Hasil akurat dan transparan
 
-### 9. Secure Assessment
-- Session validation
-- Prevent cheating (disable context menu, text selection)
-- Single submit enforcement
-- Secure database handling
-- Password hashing (SHA-256 with salt)
+---
+
+## Security Features
+
+Examora dilengkapi dengan keamanan tingkat enterprise:
+
+| Feature | Description |
+|---------|-------------|
+| **CSRF Protection** | Token validation pada semua POST request |
+| **XSS Prevention** | Output encoding dengan JSTL escape |
+| **Security Headers** | CSP, X-Frame-Options, X-Content-Type-Options, dll |
+| **Password Hashing** | BCrypt dengan salt (jBcrypt) |
+| **Session Fixation** | Session regeneration saat login |
+| **Secure Cookies** | HttpOnly, SameSite flags |
+| **SQL Injection** | Prepared Statements |
+| **Role-based Access** | Admin & Peserta dengan filter |
+| **Input Validation** | Sanitasi semua input user |
 
 ---
 
@@ -105,6 +145,7 @@ Examora berfungsi sebagai **platform asesmen teori** dimana peserta mengerjakan 
 | Export | html2pdf.js |
 | Build Tool | Maven |
 | Container | Docker & Docker Compose |
+| Security | BCrypt, CSRF Tokens, Security Headers |
 
 ---
 
@@ -145,6 +186,10 @@ Examora berfungsi sebagai **platform asesmen teori** dimana peserta mengerjakan 
 2. **Create the database**
    ```bash
    mysql -u root -p < sql/schema.sql
+   mysql -u root -p < sql/add_question_bank.sql
+   mysql -u root -p < sql/add_audit_log.sql
+   mysql -u root -p < sql/add_achievements.sql
+   mysql -u root -p < sql/add_notifications.sql
    ```
 
 3. **Configure database connection**
@@ -156,22 +201,33 @@ Examora berfungsi sebagai **platform asesmen teori** dimana peserta mengerjakan 
    db.password=your_password
    ```
 
-4. **Build the project**
+4. **Configure email (optional)**
+
+   Add to `db.properties`:
+   ```properties
+   email.smtp.host=smtp.gmail.com
+   email.smtp.port=587
+   email.username=your-email@gmail.com
+   email.password=your-app-password
+   email.from=noreply@examora.com
+   ```
+
+5. **Build the project**
    ```bash
    mvn clean package
    ```
 
-5. **Deploy to Tomcat**
+6. **Deploy to Tomcat**
    ```bash
    cp target/examora.war $TOMCAT_HOME/webapps/
    ```
 
-6. **Start Tomcat**
+7. **Start Tomcat**
    ```bash
    $TOMCAT_HOME/bin/startup.sh
    ```
 
-7. **Access the application**
+8. **Access the application**
 
    Open your browser and navigate to: `http://localhost:8080/examora`
 
@@ -201,7 +257,10 @@ Examora/
 ├── sql/                       # Database scripts
 │   ├── schema.sql             # Main database schema
 │   ├── sample_data.sql        # Sample data
-│   └── add_*.sql              # Migration scripts
+│   ├── add_question_bank.sql  # Question bank tables
+│   ├── add_audit_log.sql      # Audit log table
+│   ├── add_achievements.sql   # Achievements tables
+│   └── add_notifications.sql  # Notifications tables
 ├── docker-compose.yml         # Docker configuration
 ├── Dockerfile                 # Docker build file
 ├── pom.xml                    # Maven configuration
@@ -216,20 +275,9 @@ Setelah instalasi, Anda dapat login dengan akun default:
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@examora.com | admin123 |
+| Admin | martin.trainer@ids.ac.id | admin123 |
 
----
-
-## Security Features
-
-- Password hashing (SHA-256 with salt)
-- SQL injection prevention (Prepared Statements)
-- XSS prevention (Input sanitization)
-- Session management
-- Role-based access control
-- Quiz deadline validation
-- Timezone-aware timestamp handling (WIB/Jakarta)
-- CSRF protection
+> **Note:** Ganti password default setelah instalasi pertama untuk keamanan.
 
 ---
 
@@ -239,18 +287,52 @@ Setelah instalasi, Anda dapat login dengan akun default:
 Halaman utama dengan informasi fitur lengkap
 
 ### Dashboard Admin
-- Kelola Quiz
+- Kelola Quiz dengan Bank Soal
 - Kelola User dengan Import CSV
 - Kelola Arena
 - Kelola Absensi
 - Lihat Statistik
+- Achievement Management
+- Notifikasi & Email Templates
+- Audit Log
 
 ### Dashboard Peserta
-- Quiz Tersedia
+- Quiz Tersedia (filter berdasarkan tag)
 - Arena Mode
 - Absensi dengan Kode Unik
 - Riwayat Ujian
+- Achievement & Badges
 - Google Drive Integration
+
+---
+
+## API Endpoints
+
+### Public
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/LoginServlet` | GET/POST | Login |
+| `/RegisterServlet` | GET/POST | Register |
+
+### Admin Only
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/AdminServlet` | GET/POST | Dashboard & User Management |
+| `/QuizServlet` | GET/POST | Quiz Management |
+| `/QuestionServlet` | GET/POST | Question Management |
+| `/QuestionBankServlet` | GET/POST | Question Bank Management |
+| `/ArenaServlet` | GET/POST | Arena Management |
+| `/AttendanceServlet` | GET/POST | Attendance Management |
+| `/AchievementServlet` | GET/POST | Achievement Management |
+| `/NotificationServlet` | GET/POST | Notification Management |
+| `/AuditServlet` | GET | View Audit Logs |
+
+### User
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/ExamServlet` | GET/POST | Quiz Taking |
+| `/ArenaServlet` | GET/POST | Arena Participation |
+| `/AttendanceServlet` | GET/POST | Attendance Check-in |
 
 ---
 
@@ -261,6 +343,28 @@ Halaman utama dengan informasi fitur lengkap
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+---
+
+## Changelog
+
+### v2.0.0 (Current)
+- Added Question Bank with categories
+- Added Achievement & Gamification system
+- Added Email Notification system
+- Added Audit Logging
+- Enhanced Security (CSRF, XSS, Security Headers)
+- BCrypt password hashing
+- Session fixation protection
+- Tag-based quiz filtering
+- Improved UI/UX consistency
+
+### v1.0.0
+- Initial release
+- Quiz management
+- Arena mode
+- Attendance system
+- Statistics & Analytics
 
 ---
 

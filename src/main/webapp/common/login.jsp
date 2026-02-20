@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page import="com.examora.model.User" %>
 <%
     User user = (User) session.getAttribute("user");
@@ -6,8 +8,8 @@
         response.sendRedirect(user.isAdmin() ? "../admin/dashboard.jsp" : "../user/dashboard.jsp");
         return;
     }
-    String error = (String) request.getAttribute("error");
-    String email = (String) request.getAttribute("email");
+    pageContext.setAttribute("error", request.getAttribute("error"));
+    pageContext.setAttribute("email", request.getAttribute("email"));
 %>
 <!DOCTYPE html>
 <html lang="id">
@@ -33,12 +35,12 @@
                             <p class="text-muted">Masuk ke akun Anda</p>
                         </div>
 
-                        <% if (error != null) { %>
+                        <c:if test="${not empty error}">
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="bi bi-exclamation-triangle me-2"></i><%= error %>
+                            <i class="bi bi-exclamation-triangle me-2"></i><c:out value="${error}"/>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
-                        <% } %>
+                        </c:if>
 
                         <form action="../LoginServlet" method="post">
                             <div class="mb-3">
@@ -46,7 +48,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                     <input type="email" class="form-control" id="email" name="email"
-                                           value="<%= email != null ? email : "" %>" required
+                                           value="${fn:escapeXml(email)}" required
                                            placeholder="Masukkan email">
                                 </div>
                             </div>

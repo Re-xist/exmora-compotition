@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="com.examora.model.User" %>
 <%@ page import="com.examora.model.Quiz" %>
 <%@ page import="com.examora.model.Question" %>
@@ -81,6 +82,7 @@
         <form id="examForm">
             <input type="hidden" name="submissionId" value="<%= submission.getId() %>">
             <input type="hidden" name="timeSpent" id="timeSpent" value="0">
+            <input type="hidden" name="csrfToken" id="csrfToken" value="<%= session.getAttribute("csrfToken") %>">
 
             <% for (int i = 0; i < questions.size(); i++) {
                 Question q = questions.get(i);
@@ -248,10 +250,11 @@
 
         // Save answer to server
         function saveAnswerToServer(questionId, selectedAnswer) {
+            const csrfToken = document.getElementById('csrfToken').value;
             fetch('../ExamServlet?action=saveAnswer', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'submissionId=' + submissionId + '&questionId=' + questionId + '&selectedAnswer=' + selectedAnswer
+                body: 'submissionId=' + submissionId + '&questionId=' + questionId + '&selectedAnswer=' + selectedAnswer + '&csrfToken=' + encodeURIComponent(csrfToken)
             })
             .then(response => response.json())
             .then(data => {

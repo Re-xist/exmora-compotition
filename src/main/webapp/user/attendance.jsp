@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="com.examora.model.User" %>
 <%@ page import="com.examora.model.AttendanceSession" %>
 <%@ page import="java.util.List" %>
@@ -126,6 +127,7 @@
                         <p class="text-muted mb-4">Masukkan 6 karakter kode absensi yang diberikan oleh admin/pengajar</p>
 
                         <form id="attendanceForm">
+                            <input type="hidden" name="csrfToken" id="csrfToken" value="<%= session.getAttribute("csrfToken") %>">
                             <div class="mb-4">
                                 <input type="text" class="form-control form-control-lg text-center font-monospace"
                                        name="sessionCode" id="sessionCode" maxlength="6"
@@ -251,6 +253,7 @@
             const params = new URLSearchParams();
             params.append('action', 'join');
             params.append('sessionCode', code);
+            params.append('csrfToken', document.getElementById('csrfToken').value);
 
             fetch('AttendanceServlet', {
                 method: 'POST',

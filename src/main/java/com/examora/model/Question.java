@@ -17,9 +17,16 @@ public class Question {
     private Integer questionOrder;
     private LocalDateTime createdAt;
 
+    // Question Bank fields
+    private Integer categoryId;
+    private Boolean isBankQuestion;
+
     // For user answers
     private String selectedAnswer;
     private Boolean isCorrect;
+
+    // Additional display fields
+    private String categoryName;
 
     // Constructors
     public Question() {}
@@ -130,6 +137,30 @@ public class Question {
 
     public void setIsCorrect(Boolean isCorrect) {
         this.isCorrect = isCorrect;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Boolean getIsBankQuestion() {
+        return isBankQuestion;
+    }
+
+    public void setIsBankQuestion(Boolean isBankQuestion) {
+        this.isBankQuestion = isBankQuestion;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     // Helper method to get option by letter

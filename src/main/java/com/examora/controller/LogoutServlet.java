@@ -1,5 +1,7 @@
 package com.examora.controller;
 
+import com.examora.model.User;
+import com.examora.service.AuditService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,6 +15,12 @@ import java.io.IOException;
  */
 @WebServlet("/LogoutServlet")
 public class LogoutServlet extends HttpServlet {
+    private AuditService auditService;
+
+    @Override
+    public void init() throws ServletException {
+        auditService = new AuditService();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,6 +39,11 @@ public class LogoutServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
 
         if (session != null) {
+            // Get user before invalidating session for audit log
+            User user = (User) session.getAttribute("user");
+            if (user != null) {
+                auditService.logLogout(user, request);
+            }
             session.invalidate();
         }
 

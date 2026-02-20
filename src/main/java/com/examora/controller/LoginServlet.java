@@ -1,6 +1,7 @@
 package com.examora.controller;
 
 import com.examora.model.User;
+import com.examora.service.AuditService;
 import com.examora.service.UserService;
 
 import jakarta.servlet.ServletException;
@@ -17,10 +18,12 @@ import java.io.IOException;
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
     private UserService userService;
+    private AuditService auditService;
 
     @Override
     public void init() throws ServletException {
         userService = new UserService();
+        auditService = new AuditService();
     }
 
     @Override
@@ -52,6 +55,13 @@ public class LoginServlet extends HttpServlet {
         try {
             User user = userService.authenticate(email, password);
 
+            // Invalidate old session to prevent session fixation attacks
+            HttpSession oldSession = request.getSession(false);
+            if (oldSession != null) {
+                oldSession.invalidate();
+            }
+
+            // Create new session with new ID
             HttpSession session = request.getSession(true);
             session.setAttribute("user", user);
             session.setAttribute("userId", user.getId());
@@ -59,9 +69,17 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userRole", user.getRole());
             session.setAttribute("csrfToken", com.examora.util.PasswordUtil.generateToken());
 
+            // Audit log for successful login
+            auditService.logLogin(user, request, true, null);
+
             redirectToDashboard(request, response, user);
 
         } catch (UserService.ServiceException e) {
+            // Audit log for failed login (create temporary user object for logging)
+            User failedUser = new User();
+            failedUser.setEmail(email);
+            auditService.logLogin(failedUser, request, false, e.getMessage());
+
             request.setAttribute("error", e.getMessage());
             request.setAttribute("email", email);
             request.getRequestDispatcher("/common/login.jsp").forward(request, response);

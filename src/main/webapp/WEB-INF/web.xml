@@ -28,6 +28,7 @@
         <cookie-config>
             <http-only>true</http-only>
             <secure>false</secure>
+            <same-site>Lax</same-site>
         </cookie-config>
         <tracking-mode>COOKIE</tracking-mode>
     </session-config>

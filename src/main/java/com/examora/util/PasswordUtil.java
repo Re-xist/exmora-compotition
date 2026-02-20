@@ -1,5 +1,6 @@
 package com.examora.util;
 
+import org.mindrot.jbcrypt.BCrypt;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -7,45 +8,38 @@ import java.util.Base64;
 
 /**
  * Password Utility Class - Handles password hashing and verification
- * Note: For production, consider using BCrypt library (jBCrypt or Spring Security)
+ * Uses BCrypt for secure password hashing
  */
 public class PasswordUtil {
     private static final int SALT_LENGTH = 16;
     private static final int ITERATIONS = 10000;
     private static final String ALGORITHM = "SHA-256";
+    private static final int BCRYPT_ROUNDS = 12;
 
     /**
-     * Hash a password with salt
+     * Hash a password using BCrypt
      */
     public static String hashPassword(String password) {
-        try {
-            SecureRandom random = new SecureRandom();
-            byte[] salt = new byte[SALT_LENGTH];
-            random.nextBytes(salt);
-
-            byte[] hash = hashWithSalt(password, salt, ITERATIONS);
-
-            // Format: iterations:salt:hash
-            return ITERATIONS + ":" +
-                    Base64.getEncoder().encodeToString(salt) + ":" +
-                    Base64.getEncoder().encodeToString(hash);
-        } catch (Exception e) {
-            throw new RuntimeException("Error hashing password", e);
-        }
+        // Use BCrypt for new passwords
+        return BCrypt.hashpw(password, BCrypt.gensalt(BCRYPT_ROUNDS));
     }
 
     /**
      * Verify a password against a hash
+     * Supports both BCrypt and legacy SHA-256 hashes
      */
     public static boolean verifyPassword(String password, String storedHash) {
+        if (password == null || storedHash == null || storedHash.isEmpty()) {
+            return false;
+        }
+
         try {
-            // Handle legacy bcrypt hashes (for backward compatibility)
+            // Handle BCrypt hashes
             if (storedHash.startsWith("$2a$") || storedHash.startsWith("$2b$")) {
-                // For demo purposes, accept the default password
-                // In production, use proper BCrypt library
-                return true;
+                return BCrypt.checkpw(password, storedHash);
             }
 
+            // Handle legacy SHA-256 hashes (format: iterations:salt:hash)
             String[] parts = storedHash.split(":");
             if (parts.length != 3) {
                 return false;
@@ -65,7 +59,7 @@ public class PasswordUtil {
     }
 
     /**
-     * Hash password with salt using PBKDF2-like approach
+     * Hash password with salt using PBKDF2-like approach (legacy support)
      */
     private static byte[] hashWithSalt(String password, byte[] salt, int iterations)
             throws NoSuchAlgorithmException {
@@ -92,5 +86,13 @@ public class PasswordUtil {
         byte[] token = new byte[32];
         random.nextBytes(token);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(token);
+    }
+
+    /**
+     * Check if a hash needs to be rehashed (for migration to BCrypt)
+     */
+    public static boolean needsRehash(String storedHash) {
+        // If it's not a BCrypt hash, it needs rehashing
+        return !storedHash.startsWith("$2a$") && !storedHash.startsWith("$2b$");
     }
 }

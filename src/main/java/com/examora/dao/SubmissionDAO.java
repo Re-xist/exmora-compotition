@@ -558,4 +558,44 @@ public class SubmissionDAO {
 
         return submission;
     }
+
+    /**
+     * Count completed submissions by user
+     */
+    public int countCompletedByUserId(Integer userId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM submissions WHERE user_id = ? AND status = 'completed'";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Count perfect scores by user
+     */
+    public int countPerfectScoresByUserId(Integer userId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM submissions WHERE user_id = ? AND score = 100 AND status = 'completed'";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
 }

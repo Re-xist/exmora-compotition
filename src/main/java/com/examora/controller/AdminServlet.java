@@ -2,6 +2,7 @@ package com.examora.controller;
 
 import com.examora.model.User;
 import com.examora.service.AttendanceService;
+import com.examora.service.AuditService;
 import com.examora.service.QuizService;
 import com.examora.service.SubmissionService;
 import com.examora.service.UserService;
@@ -19,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +34,7 @@ public class AdminServlet extends HttpServlet {
     private QuizService quizService;
     private SubmissionService submissionService;
     private AttendanceService attendanceService;
+    private AuditService auditService;
 
     @Override
     public void init() throws ServletException {
@@ -39,6 +42,7 @@ public class AdminServlet extends HttpServlet {
         quizService = new QuizService();
         submissionService = new SubmissionService();
         attendanceService = new AttendanceService();
+        auditService = new AuditService();
     }
 
     @Override
@@ -113,7 +117,15 @@ public class AdminServlet extends HttpServlet {
                 return;
             }
 
+            // Get user info before deletion for audit log
+            User userToDelete = userService.getUserById(userId);
+            String deletedUserName = userToDelete != null ? userToDelete.getEmail() : "Unknown";
+
             userService.deleteUser(userId);
+
+            // Audit log
+            auditService.logDelete("USER", userId, deletedUserName, currentUser, request);
+
             request.setAttribute("success", "User berhasil dihapus");
             listUsers(request, response);
 
@@ -128,6 +140,7 @@ public class AdminServlet extends HttpServlet {
 
     private void createUser(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User currentUser = (User) request.getSession().getAttribute("user");
         try {
             String name = request.getParameter("name");
             String email = request.getParameter("email");
@@ -152,7 +165,16 @@ public class AdminServlet extends HttpServlet {
                 return;
             }
 
-            userService.register(name.trim(), email.trim(), password, role != null ? role : "peserta", tag, gdriveLink);
+            User newUser = userService.register(name.trim(), email.trim(), password, role != null ? role : "peserta", tag, gdriveLink);
+
+            // Audit log
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", name);
+            data.put("email", email);
+            data.put("role", role);
+            data.put("tag", tag);
+            auditService.logCreate("USER", newUser.getId(), email, data, currentUser, request);
+
             request.setAttribute("success", "User berhasil dibuat");
             listUsers(request, response);
 
@@ -164,6 +186,7 @@ public class AdminServlet extends HttpServlet {
 
     private void editUser(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User currentUser = (User) request.getSession().getAttribute("user");
         try {
             String userIdStr = request.getParameter("userId");
             String name = request.getParameter("name");
@@ -183,6 +206,14 @@ public class AdminServlet extends HttpServlet {
             // Update user profile with tag and gdrive link
             userService.updateUserProfile(userId, name, email, role, tag, gdriveLink);
 
+            // Audit log
+            Map<String, Object> data = new HashMap<>();
+            data.put("name", name);
+            data.put("email", email);
+            data.put("role", role);
+            data.put("tag", tag);
+            auditService.logUpdate("USER", userId, email, data, currentUser, request);
+
             request.setAttribute("success", "User berhasil diupdate");
             listUsers(request, response);
 
@@ -197,6 +228,7 @@ public class AdminServlet extends HttpServlet {
 
     private void resetPassword(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        User currentUser = (User) request.getSession().getAttribute("user");
         try {
             String userIdStr = request.getParameter("userId");
             String newPassword = request.getParameter("newPassword");
@@ -214,7 +246,15 @@ public class AdminServlet extends HttpServlet {
             }
 
             Integer userId = Integer.parseInt(userIdStr);
+
+            // Get user info for audit
+            User targetUser = userService.getUserById(userId);
+            String targetEmail = targetUser != null ? targetUser.getEmail() : "Unknown";
+
             userService.resetPasswordByAdmin(userId, newPassword);
+
+            // Audit log
+            auditService.log("UPDATE", "USER", userId, targetEmail + " (password reset)", null, currentUser, request);
 
             request.setAttribute("success", "Password berhasil direset");
             listUsers(request, response);

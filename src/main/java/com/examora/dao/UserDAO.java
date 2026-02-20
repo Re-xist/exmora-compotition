@@ -5,7 +5,9 @@ import com.examora.util.DBUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User Data Access Object - Handles database operations for users
@@ -290,6 +292,29 @@ public class UserDAO {
         user.setTag(rs.getString("tag"));
         user.setPhoto(rs.getString("photo"));
         user.setGdriveLink(rs.getString("gdrive_link"));
+
+        // Achievement statistics (handle null for backward compatibility)
+        try {
+            user.setTotalPoints(rs.getInt("total_points"));
+            if (rs.wasNull()) user.setTotalPoints(0);
+        } catch (SQLException e) {
+            user.setTotalPoints(0);
+        }
+
+        try {
+            user.setTotalQuizzes(rs.getInt("total_quizzes"));
+            if (rs.wasNull()) user.setTotalQuizzes(0);
+        } catch (SQLException e) {
+            user.setTotalQuizzes(0);
+        }
+
+        try {
+            user.setPerfectScores(rs.getInt("perfect_scores"));
+            if (rs.wasNull()) user.setPerfectScores(0);
+        } catch (SQLException e) {
+            user.setPerfectScores(0);
+        }
+
         user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         user.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
         return user;
@@ -309,5 +334,54 @@ public class UserDAO {
 
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    /**
+     * Update user statistics for achievements
+     */
+    public boolean updateStatistics(Integer userId, Integer totalPoints, Integer totalQuizzes, Integer perfectScores) throws SQLException {
+        String sql = "UPDATE users SET total_points = ?, total_quizzes = ?, perfect_scores = ? WHERE id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, totalPoints != null ? totalPoints : 0);
+            stmt.setInt(2, totalQuizzes != null ? totalQuizzes : 0);
+            stmt.setInt(3, perfectScores != null ? perfectScores : 0);
+            stmt.setInt(4, userId);
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Get top users by points for leaderboard
+     */
+    public List<Map<String, Object>> getTopUsersByPoints(int limit) throws SQLException {
+        String sql = "SELECT id, name, email, total_points, total_quizzes, perfect_scores " +
+                     "FROM users WHERE role = 'peserta' " +
+                     "ORDER BY total_points DESC, total_quizzes DESC " +
+                     "LIMIT ?";
+        List<Map<String, Object>> leaderboard = new ArrayList<>();
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, limit);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> entry = new HashMap<>();
+                    entry.put("id", rs.getInt("id"));
+                    entry.put("name", rs.getString("name"));
+                    entry.put("email", rs.getString("email"));
+                    entry.put("totalPoints", rs.getInt("total_points"));
+                    entry.put("totalQuizzes", rs.getInt("total_quizzes"));
+                    entry.put("perfectScores", rs.getInt("perfect_scores"));
+                    leaderboard.add(entry);
+                }
+            }
+        }
+        return leaderboard;
     }
 }

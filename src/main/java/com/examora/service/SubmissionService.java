@@ -22,11 +22,13 @@ public class SubmissionService {
     private SubmissionDAO submissionDAO;
     private QuizDAO quizDAO;
     private QuestionDAO questionDAO;
+    private AchievementService achievementService;
 
     public SubmissionService() {
         this.submissionDAO = new SubmissionDAO();
         this.quizDAO = new QuizDAO();
         this.questionDAO = new QuestionDAO();
+        this.achievementService = new AchievementService();
     }
 
     /**
@@ -187,6 +189,21 @@ public class SubmissionService {
 
             // Set answers for display
             submission.setAnswers(answers);
+
+            // Check and award achievements (async - don't fail submission if this fails)
+            try {
+                Quiz quiz = quizDAO.findById(submission.getQuizId());
+                achievementService.checkAndAwardAchievements(
+                    submission.getUserId(),
+                    submission.getQuizId(),
+                    submission.getScore(),
+                    timeSpent != null ? timeSpent : 0,
+                    quiz != null ? quiz.getDuration() : 0
+                );
+            } catch (Exception e) {
+                // Log error but don't fail the submission
+                System.err.println("Error checking achievements: " + e.getMessage());
+            }
 
             return submission;
 

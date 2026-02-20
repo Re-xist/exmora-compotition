@@ -14,6 +14,12 @@ public class User {
     private String tag; // Tag/kelompok user (contoh: Kelas A, Divisi IT, dll)
     private String photo; // Profile photo path
     private String gdriveLink; // Google Drive link
+
+    // Achievement statistics
+    private Integer totalPoints;
+    private Integer totalQuizzes;
+    private Integer perfectScores;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -114,6 +120,30 @@ public class User {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Integer getTotalPoints() {
+        return totalPoints;
+    }
+
+    public void setTotalPoints(Integer totalPoints) {
+        this.totalPoints = totalPoints;
+    }
+
+    public Integer getTotalQuizzes() {
+        return totalQuizzes;
+    }
+
+    public void setTotalQuizzes(Integer totalQuizzes) {
+        this.totalQuizzes = totalQuizzes;
+    }
+
+    public Integer getPerfectScores() {
+        return perfectScores;
+    }
+
+    public void setPerfectScores(Integer perfectScores) {
+        this.perfectScores = perfectScores;
     }
 
     // Helper methods

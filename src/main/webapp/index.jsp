@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="com.examora.model.User" %>
 <%
     User user = (User) session.getAttribute("user");
@@ -103,20 +104,20 @@
                         </div>
                         <div class="col-auto">
                             <div class="d-flex align-items-center text-white">
-                                <i class="bi bi-google fs-4 me-2"></i>
-                                <span>Google Drive</span>
+                                <i class="bi bi-collection fs-4 me-2"></i>
+                                <span>Bank Soal</span>
                             </div>
                         </div>
                         <div class="col-auto">
                             <div class="d-flex align-items-center text-white">
-                                <i class="bi bi-graph-up fs-4 me-2"></i>
-                                <span>Statistik</span>
+                                <i class="bi bi-award fs-4 me-2"></i>
+                                <span>Achievements</span>
                             </div>
                         </div>
                         <div class="col-auto">
                             <div class="d-flex align-items-center text-white">
-                                <i class="bi bi-check2-square fs-4 me-2"></i>
-                                <span>Absensi</span>
+                                <i class="bi bi-envelope fs-4 me-2"></i>
+                                <span>Notifikasi</span>
                             </div>
                         </div>
                     </div>
@@ -330,6 +331,90 @@
                                 <li><i class="bi bi-check text-success me-1"></i>Kode absensi unik</li>
                                 <li><i class="bi bi-check text-success me-1"></i>Export PDF/CSV</li>
                                 <li><i class="bi bi-check text-success me-1"></i>Target per tag</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question Bank -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="feature-icon text-white rounded-circle mb-3" style="background-color: #6f42c1;">
+                                <i class="bi bi-collection"></i>
+                            </div>
+                            <h5 class="card-title">Bank Soal</h5>
+                            <p class="card-text text-muted">
+                                Simpan dan kelola pool soal untuk digunakan ulang di berbagai quiz
+                                dengan kategorisasi yang mudah.
+                            </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Reuse soal</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Kategori soal</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Pilih saat buat quiz</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="feature-icon text-white rounded-circle mb-3" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
+                                <i class="bi bi-award"></i>
+                            </div>
+                            <h5 class="card-title">Achievements</h5>
+                            <p class="card-text text-muted">
+                                Sistem badge dan gamification untuk meningkatkan engagement
+                                peserta dengan reward berbasis performa.
+                            </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Badge & points</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Perfect score reward</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Leaderboard</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="feature-icon text-white rounded-circle mb-3" style="background-color: #0dcaf0;">
+                                <i class="bi bi-envelope"></i>
+                            </div>
+                            <h5 class="card-title">Notifikasi Email</h5>
+                            <p class="card-text text-muted">
+                                Template email yang dapat dikustomisasi untuk notifikasi quiz baru,
+                                deadline, dan hasil quiz.
+                            </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Email templates</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Deadline reminder</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Result notification</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Log -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="feature-icon text-white rounded-circle mb-3" style="background-color: #495057;">
+                                <i class="bi bi-clipboard-data"></i>
+                            </div>
+                            <h5 class="card-title">Audit Log</h5>
+                            <p class="card-text text-muted">
+                                Tracking semua aktivitas admin dengan detail lengkap
+                                termasuk IP address dan timestamp.
+                            </p>
+                            <ul class="list-unstyled text-muted small mb-0">
+                                <li><i class="bi bi-check text-success me-1"></i>Login/logout tracking</li>
+                                <li><i class="bi bi-check text-success me-1"></i>CRUD operations</li>
+                                <li><i class="bi bi-check text-success me-1"></i>Filter & search</li>
                             </ul>
                         </div>
                     </div>

@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="com.examora.model.User" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
@@ -35,51 +36,7 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <nav class="sidebar">
-        <a href="../AdminServlet?action=dashboard" class="sidebar-brand">
-            <i class="bi bi-journal-check me-2"></i>Examora
-        </a>
-        <hr class="sidebar-divider bg-white opacity-25">
-        <ul class="sidebar-menu">
-            <li>
-                <a href="../AdminServlet?action=dashboard" class="active">
-                    <i class="bi bi-speedometer2"></i>Dashboard
-                </a>
-            </li>
-            <li>
-                <a href="../QuizServlet?action=list">
-                    <i class="bi bi-journal-text"></i>Kelola Quiz
-                </a>
-            </li>
-            <li>
-                <a href="../ArenaServlet?action=list">
-                    <i class="bi bi-trophy"></i>Kelola Arena
-                </a>
-            </li>
-            <li>
-                <a href="../AdminServlet?action=users">
-                    <i class="bi bi-people"></i>Kelola User
-                </a>
-            </li>
-            <li>
-                <a href="../AttendanceServlet?action=list">
-                    <i class="bi bi-check2-square"></i>Absensi
-                </a>
-            </li>
-            <li>
-                <a href="../AdminServlet?action=statistics">
-                    <i class="bi bi-graph-up"></i>Statistik
-                </a>
-            </li>
-            <li>
-            </li>
-            <li class="mt-5">
-                <a href="../LogoutServlet">
-                    <i class="bi bi-box-arrow-left"></i>Logout
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <%@ include file="sidebar.jsp" %>
 
     <!-- Main Content -->
     <div class="main-content">

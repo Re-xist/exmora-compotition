@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="com.examora.model.User" %>
 <%
     User currentUser = (User) session.getAttribute("user");
@@ -106,6 +107,7 @@
                     </div>
                     <div class="card-body p-4">
                         <form action="../ArenaServlet?action=join" method="POST">
+                            <input type="hidden" name="csrfToken" value="<%= session.getAttribute("csrfToken") %>" />
                             <div class="mb-4">
                                 <label for="code" class="form-label">Kode Arena</label>
                                 <input type="text" class="form-control form-control-lg text-center"

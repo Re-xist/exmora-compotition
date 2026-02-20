@@ -1,7 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="com.examora.model.User" %>
 <%@ page import="com.examora.model.Quiz" %>
 <%@ page import="com.examora.model.Question" %>
+<%@ page import="com.examora.model.QuestionCategory" %>
+<%@ page import="com.examora.service.QuestionBankService" %>
 <%@ page import="java.util.List" %>
 <%
     User currentUser = (User) session.getAttribute("user");
@@ -13,6 +16,17 @@
     List<Question> questions = (List<Question>) request.getAttribute("questions");
     String success = (String) request.getAttribute("success");
     String error = (String) request.getAttribute("error");
+
+    // Get bank questions for selection modal
+    List<Question> bankQuestions = null;
+    List<QuestionCategory> categories = null;
+    try {
+        QuestionBankService qbs = new QuestionBankService();
+        bankQuestions = qbs.getAllBankQuestions();
+        categories = qbs.getAllCategories();
+    } catch (Exception e) {
+        // Ignore
+    }
 
     if (quiz == null) {
         response.sendRedirect("../QuizServlet?action=list");
@@ -32,21 +46,7 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <nav class="sidebar">
-        <a href="../AdminServlet?action=dashboard" class="sidebar-brand">
-            <i class="bi bi-journal-check me-2"></i>Examora
-        </a>
-        <hr class="sidebar-divider bg-white opacity-25">
-        <ul class="sidebar-menu">
-            <li><a href="../AdminServlet?action=dashboard"><i class="bi bi-speedometer2"></i>Dashboard</a></li>
-            <li><a href="../QuizServlet?action=list" class="active"><i class="bi bi-journal-text"></i>Kelola Quiz</a></li>
-            <li><a href="../ArenaServlet?action=list"><i class="bi bi-trophy"></i>Kelola Arena</a></li>
-            <li><a href="../AdminServlet?action=users"><i class="bi bi-people"></i>Kelola User</a></li>
-            <li><a href="../AttendanceServlet?action=list"><i class="bi bi-check2-square"></i>Absensi</a></li>
-            <li><a href="../AdminServlet?action=statistics"><i class="bi bi-graph-up"></i>Statistik</a></li>
-            <li class="mt-5"><a href="../LogoutServlet"><i class="bi bi-box-arrow-left"></i>Logout</a></li>
-        </ul>
-    </nav>
+    <%@ include file="sidebar.jsp" %>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -63,8 +63,13 @@
             </div>
             <div class="d-flex gap-2">
                 <a href="../QuestionServlet?action=create&quizId=<%= quiz.getId() %>" class="btn btn-primary">
-                    <i class="bi bi-plus-lg me-2"></i>Tambah Soal
+                    <i class="bi bi-plus-lg me-2"></i>Tambah Soal Baru
                 </a>
+                <% if (bankQuestions != null && !bankQuestions.isEmpty()) { %>
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bankModal">
+                    <i class="bi bi-collection me-2"></i>Dari Bank Soal
+                </button>
+                <% } %>
                 <a href="../QuizServlet?action=list" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>Kembali
                 </a>
@@ -195,6 +200,109 @@
         <% } %>
     </div>
 
+    <!-- Modal: Add from Bank -->
+    <div class="modal fade" id="bankModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-collection me-2"></i>Pilih dari Bank Soal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bankForm" action="../QuestionBankServlet?action=addToQuiz" method="post">
+                        <input type="hidden" name="csrfToken" value="<%= session.getAttribute("csrfToken") %>">
+                        <input type="hidden" name="quizId" value="<%= quiz.getId() %>">
+
+                        <% if (categories != null && !categories.isEmpty()) { %>
+                        <div class="mb-3">
+                            <label class="form-label">Filter Kategori:</label>
+                            <select class="form-select" id="categoryFilter" onchange="filterQuestions()">
+                                <option value="">Semua Kategori</option>
+                                <% for (QuestionCategory cat : categories) { %>
+                                <option value="cat-<%= cat.getId() %>"><%= cat.getName() %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <% } %>
+
+                        <div class="table-responsive" style="max-height: 400px;">
+                            <table class="table table-hover table-sm">
+                                <thead class="sticky-top bg-white">
+                                    <tr>
+                                        <th width="40"><input type="checkbox" id="selectAll" onchange="toggleAll()"></th>
+                                        <th>Soal</th>
+                                        <th>Kategori</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (bankQuestions != null) {
+                                        for (Question q : bankQuestions) { %>
+                                    <tr class="bank-question" data-category="cat-<%= q.getCategoryId() != null ? q.getCategoryId() : "" %>">
+                                        <td>
+                                            <input type="checkbox" name="questionIds" value="<%= q.getId() %>" class="q-checkbox">
+                                        </td>
+                                        <td>
+                                            <small><%= q.getQuestionText().length() > 100 ? q.getQuestionText().substring(0, 100) + "..." : q.getQuestionText() %></small>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted"><%= q.getCategoryName() != null ? q.getCategoryName() : "-" %></small>
+                                        </td>
+                                    </tr>
+                                    <% }
+                                    } %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3">
+                            <span class="text-muted"><span id="selectedCount">0</span> soal dipilih</span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('bankForm').submit()">
+                        <i class="bi bi-plus-lg me-1"></i>Tambah ke Quiz
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleAll() {
+            const checkboxes = document.querySelectorAll('.q-checkbox');
+            const selectAll = document.getElementById('selectAll');
+            checkboxes.forEach(cb => {
+                const row = cb.closest('tr');
+                if (row.style.display !== 'none') {
+                    cb.checked = selectAll.checked;
+                }
+            });
+            updateCount();
+        }
+
+        function filterQuestions() {
+            const filter = document.getElementById('categoryFilter').value;
+            const rows = document.querySelectorAll('.bank-question');
+            rows.forEach(row => {
+                if (!filter || row.dataset.category === filter) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function updateCount() {
+            const checked = document.querySelectorAll('.q-checkbox:checked').length;
+            document.getElementById('selectedCount').textContent = checked;
+        }
+
+        document.querySelectorAll('.q-checkbox').forEach(cb => {
+            cb.addEventListener('change', updateCount);
+        });
+    </script>
 </body>
 </html>

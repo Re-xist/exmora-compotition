@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class QuizDAO {
 
-    // Common column list for SELECT queries (without target_tag for backward compatibility)
+    // Common column list for SELECT queries
     private static final String QUIZ_COLUMNS = "q.id, q.title, q.description, q.duration, q.is_active, q.deadline, " +
-                                               "q.created_by, q.created_at, q.updated_at";
+                                               "q.target_tag, q.created_by, q.created_at, q.updated_at";
 
     /**
      * Create a new quiz
@@ -225,12 +225,55 @@ public class QuizDAO {
     }
 
     /**
-     * Get active quizzes for a specific tag (or all if tag is null/empty)
-     * Note: target_tag filtering disabled for backward compatibility
+     * Get active quizzes for a specific tag (or public quizzes if tag is null/empty)
+     * Logic:
+     * - If user has a tag: show quizzes matching their tag OR public quizzes (target_tag is null/empty)
+     * - If user has no tag: show only public quizzes (target_tag is null/empty)
      */
     public List<Quiz> findActiveByTag(String userTag) throws SQLException {
-        // For backward compatibility, just return all active quizzes
-        return findActive();
+        String sql;
+        List<Quiz> quizzes = new ArrayList<>();
+
+        if (userTag != null && !userTag.trim().isEmpty()) {
+            // User has a tag - show matching tag OR public quizzes
+            sql = "SELECT " + QUIZ_COLUMNS + ", u.name as created_by_name, " +
+                  "(SELECT COUNT(*) FROM questions WHERE quiz_id = q.id) as question_count " +
+                  "FROM quiz q LEFT JOIN users u ON q.created_by = u.id " +
+                  "WHERE q.is_active = true AND (q.deadline IS NULL OR q.deadline > NOW()) " +
+                  "AND (q.target_tag = ? OR q.target_tag IS NULL OR q.target_tag = '') " +
+                  "ORDER BY q.deadline ASC, q.created_at DESC";
+
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                stmt.setString(1, userTag);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        quizzes.add(mapResultSetToQuiz(rs));
+                    }
+                }
+            }
+        } else {
+            // User has no tag - show only public quizzes
+            sql = "SELECT " + QUIZ_COLUMNS + ", u.name as created_by_name, " +
+                  "(SELECT COUNT(*) FROM questions WHERE quiz_id = q.id) as question_count " +
+                  "FROM quiz q LEFT JOIN users u ON q.created_by = u.id " +
+                  "WHERE q.is_active = true AND (q.deadline IS NULL OR q.deadline > NOW()) " +
+                  "AND (q.target_tag IS NULL OR q.target_tag = '') " +
+                  "ORDER BY q.deadline ASC, q.created_at DESC";
+
+            try (Connection conn = DBUtil.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+
+                while (rs.next()) {
+                    quizzes.add(mapResultSetToQuiz(rs));
+                }
+            }
+        }
+
+        return quizzes;
     }
 
     /**
@@ -251,8 +294,9 @@ public class QuizDAO {
             quiz.setDeadline(deadline.toLocalDateTime());
         }
 
-        // target_tag not selected in queries for backward compatibility
-        quiz.setTargetTag(null);
+        // Get target_tag
+        String targetTag = rs.getString("target_tag");
+        quiz.setTargetTag(targetTag);
 
         Timestamp createdAt = rs.getTimestamp("created_at");
         if (createdAt != null) {
@@ -266,5 +310,54 @@ public class QuizDAO {
 
         quiz.setQuestionCount(rs.getInt("question_count"));
         return quiz;
+    }
+
+    /**
+     * Find quizzes with upcoming deadlines within specified hours
+     */
+    public List<Quiz> findUpcomingDeadlines(int hoursAhead) throws SQLException {
+        String sql = "SELECT " + QUIZ_COLUMNS + ", u.name as created_by_name, " +
+                     "(SELECT COUNT(*) FROM questions WHERE quiz_id = q.id) as question_count " +
+                     "FROM quiz q LEFT JOIN users u ON q.created_by = u.id " +
+                     "WHERE q.is_active = true " +
+                     "AND q.deadline IS NOT NULL " +
+                     "AND q.deadline > NOW() " +
+                     "AND q.deadline <= DATE_ADD(NOW(), INTERVAL ? HOUR) " +
+                     "ORDER BY q.deadline ASC";
+        List<Quiz> quizzes = new ArrayList<>();
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, hoursAhead);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    quizzes.add(mapResultSetToQuiz(rs));
+                }
+            }
+        }
+        return quizzes;
+    }
+
+    /**
+     * Update quiz with target tag
+     */
+    public boolean updateWithTargetTag(Quiz quiz) throws SQLException {
+        String sql = "UPDATE quiz SET title = ?, description = ?, duration = ?, is_active = ?, deadline = ?, target_tag = ? WHERE id = ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, quiz.getTitle());
+            stmt.setString(2, quiz.getDescription());
+            stmt.setInt(3, quiz.getDuration());
+            stmt.setBoolean(4, quiz.getIsActive());
+            stmt.setTimestamp(5, quiz.getDeadline() != null ? Timestamp.valueOf(quiz.getDeadline()) : null);
+            stmt.setString(6, quiz.getTargetTag());
+            stmt.setInt(7, quiz.getId());
+
+            return stmt.executeUpdate() > 0;
+        }
     }
 }
